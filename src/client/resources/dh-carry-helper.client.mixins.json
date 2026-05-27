@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.dungeonhub.carryhelper.mixin.client",
+  "compatibilityLevel": "JAVA_25",
+  "client": [
+    "ClickMixin",
+    "HudRenderMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "dh-carry-helper",
+  "version": "${version}",
+  "name": "Dungeon Hub Carry Helper",
+  "description": "",
+  "authors": [],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/dh-carry-helper/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "net.dungeonhub.carryhelper.client.DhCarryHelperClient"
+    ],
+    "main": [
+      "net.dungeonhub.carryhelper.DhCarryHelper"
+    ],
+    "modmenu": [
+      "com.teamresourceful.resourcefulconfig.client.compat.fabric.modmenu.ResourcefulConfigModMenu"
+    ]
+  },
+  "mixins": [
+    "dh-carry-helper.mixins.json",
+    {
+      "config": "dh-carry-helper.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-language-kotlin": ">=${kotlin_loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}

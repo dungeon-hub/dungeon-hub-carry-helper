@@ -1,6 +1,5 @@
 package net.dungeonhub.carryhelper.client.auth
 
-import com.auth0.jwt.JWT
 import com.mojang.brigadier.context.CommandContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -16,6 +15,7 @@ import kotlinx.serialization.json.Json
 import net.dungeonhub.auth.AuthenticationProvider
 import net.dungeonhub.carryhelper.client.DhCarryHelperClient
 import net.dungeonhub.carryhelper.client.config.AuthConfig
+import net.dungeonhub.carryhelper.client.util.MessageUtil.sendDevError
 import net.dungeonhub.client.DungeonHubClient
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import net.minecraft.ChatFormatting
@@ -23,6 +23,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.ClickEvent
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
+import org.slf4j.LoggerFactory
 import java.net.URI
 import java.net.URLEncoder
 import java.net.http.HttpClient
@@ -34,6 +35,8 @@ import kotlin.time.Clock
 import kotlin.time.Duration.Companion.seconds
 
 object AuthenticationHandler : AuthenticationProvider {
+    private val logger = LoggerFactory.getLogger(AuthenticationHandler::class.java)
+
     private val httpClient: HttpClient = HttpClient.newHttpClient()
     private val json = Json {
         ignoreUnknownKeys = true
@@ -121,20 +124,15 @@ object AuthenticationHandler : AuthenticationProvider {
                     AuthConfig.offlineToken = offlineToken
                     DhCarryHelperClient.saveConfig()
 
-                    val accessToken = JWT.decode(result.data.accessToken)
+                    val claims = JwtDecoder.parseJwtClaims(result.data.accessToken)
 
-                    val username: String? = accessToken.getClaim("given_name").asString()
-                        ?: accessToken.getClaim("preferred_username").asString()
+                    val username: String? = claims["given_name"] ?: claims["preferred_username"]
 
-                    val message = if (username != null) {
-                        "[CH] Successfully logged in as $username!"
-                    } else {
-                        "[CH] Successfully logged in!"
-                    }
+                    val message = "[CH] Successfully logged in${if (username != null) " as $username" else ""}!"
 
                     startAccessTokenRefresh()
 
-                    println(message)
+                    logger.info(message)
 
                     Minecraft.getInstance().execute {
                         Minecraft.getInstance().gui.chat.addClientSystemMessage(
@@ -150,18 +148,12 @@ object AuthenticationHandler : AuthenticationProvider {
                         return@launch
                     }
 
-                    val errorMessage = "[CH] Failed to login: ${result.error.error}: ${result.error.errorDescription}"
-
-                    if (DhCarryHelperClient.isDev) {
-                        throw RuntimeException(errorMessage)
-                    } else {
-                        println(errorMessage)
-                    }
+                    logger.sendDevError("[CH] Failed to login: ${result.error.error}: ${result.error.errorDescription}")
                 }
             }
         }
 
-        println("[CH] Successfully loaded device authorization code!")
+        logger.info("[CH] Successfully loaded device authorization code!")
 
         return result
     }
@@ -204,11 +196,7 @@ object AuthenticationHandler : AuthenticationProvider {
 
                         val errorMessage = "[CH] Failed to login: ${error.error}: ${error.errorDescription}"
 
-                        if (DhCarryHelperClient.isDev) {
-                            throw RuntimeException(errorMessage)
-                        } else {
-                            println(errorMessage)
-                        }
+                        logger.sendDevError(errorMessage)
 
                         accessTokenFailure = true
 
@@ -216,7 +204,7 @@ object AuthenticationHandler : AuthenticationProvider {
                     }
 
                 } catch (exception: Exception) {
-                    exception.printStackTrace()
+                    logger.error("[CH] Failed to refresh access token!", exception)
                 }
             }
         }

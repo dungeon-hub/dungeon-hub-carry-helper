@@ -6,7 +6,7 @@ import net.dungeonhub.carryhelper.client.auth.AuthenticationHandler
 import net.dungeonhub.carryhelper.client.commands.TicketCommand
 import net.dungeonhub.carryhelper.client.config.AuthConfig
 import net.dungeonhub.carryhelper.client.logging.LogCommand
-import net.dungeonhub.connection.DiscordUserConnection
+import net.dungeonhub.carryhelper.client.service.TicketService
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 import net.fabricmc.fabric.api.client.command.v2.ClientCommands
@@ -50,10 +50,12 @@ class DhCarryHelperClient : ClientModInitializer {
         ClientLevelEvents.AFTER_CLIENT_LEVEL_CHANGE.register { _, _ ->
             AuthenticationHandler.scheduler.launch {
                 AuthenticationHandler.setup()
+                TicketService.initialize()
             }
         }
 
         ClientLifecycleEvents.CLIENT_STOPPING.register {
+            TicketService.shutdown()
             AuthenticationHandler.shutdown()
         }
     }

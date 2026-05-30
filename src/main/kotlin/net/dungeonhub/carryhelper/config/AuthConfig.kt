@@ -1,12 +1,12 @@
-package net.dungeonhub.carryhelper.client.config
+package net.dungeonhub.carryhelper.config
 
 import com.teamresourceful.resourcefulconfig.api.types.options.TranslatableValue
 import com.teamresourceful.resourcefulconfigkt.api.ConfigKt
-import net.dungeonhub.carryhelper.client.DhCarryHelperClient
+import net.dungeonhub.carryhelper.DhCarryHelper
 
-object AuthConfig : ConfigKt("${DhCarryHelperClient.MOD_ID}/auth") {
+object AuthConfig : ConfigKt("${DhCarryHelper.MOD_ID}/auth") {
     override val name: TranslatableValue
-        get() = Literal("DH Carry Helper ${DhCarryHelperClient.version}")
+        get() = Literal("DH Carry Helper ${DhCarryHelper.version}")
 
     var apiUrl by string("api_url", "https://api.dungeon-hub.net/") {
         name = Literal("API URL")

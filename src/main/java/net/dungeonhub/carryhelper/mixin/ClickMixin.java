@@ -1,6 +1,6 @@
-package net.dungeonhub.carryhelper.mixin.client;
+package net.dungeonhub.carryhelper.mixin;
 
-import net.dungeonhub.carryhelper.client.features.slayer.SlayerBossFeature;
+import net.dungeonhub.carryhelper.features.slayer.SlayerBossFeature;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.phys.HitResult;
 import org.spongepowered.asm.mixin.Mixin;

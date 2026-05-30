@@ -1,4 +1,4 @@
-package net.dungeonhub.carryhelper.client.features.slayer
+package net.dungeonhub.carryhelper.features.slayer
 
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft

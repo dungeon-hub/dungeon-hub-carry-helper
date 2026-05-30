@@ -1,6 +1,6 @@
-package net.dungeonhub.carryhelper.client.util
+package net.dungeonhub.carryhelper.util
 
-import net.dungeonhub.carryhelper.client.DhCarryHelperClient
+import net.dungeonhub.carryhelper.DhCarryHelper
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
@@ -9,7 +9,7 @@ import org.slf4j.Logger
 
 object MessageUtil {
     fun Logger.sendDevError(message: String) {
-        if (DhCarryHelperClient.isDev) {
+        if (DhCarryHelper.isDev) {
             throw RuntimeException(message)
         } else {
             println(message)
@@ -17,7 +17,7 @@ object MessageUtil {
     }
 
     fun Logger.sendDevDebug(message: String) {
-        if (DhCarryHelperClient.isDev) {
+        if (DhCarryHelper.isDev) {
             Minecraft.getInstance().execute {
                 Minecraft.getInstance().gui.chat.addClientSystemMessage(
                     Component.literal(message).setStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW))
@@ -29,7 +29,7 @@ object MessageUtil {
     }
 
     fun Logger.sendDebug(message: String) {
-        if (DhCarryHelperClient.isDev) {
+        if (DhCarryHelper.isDev) {
             Minecraft.getInstance().execute {
                 Minecraft.getInstance().gui.chat.addClientSystemMessage(
                     Component.literal(message).setStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW))

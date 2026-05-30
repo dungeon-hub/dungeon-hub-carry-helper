@@ -1,8 +1,8 @@
-package net.dungeonhub.carryhelper.client.features.overlay
+package net.dungeonhub.carryhelper.features.overlay
 
-import net.dungeonhub.carryhelper.client.service.MojangService
-import net.dungeonhub.carryhelper.client.service.TicketService
-import net.dungeonhub.carryhelper.client.auth.AuthenticationHandler
+import net.dungeonhub.carryhelper.auth.AuthenticationHandler
+import net.dungeonhub.carryhelper.service.MojangService
+import net.dungeonhub.carryhelper.service.TicketService
 import net.dungeonhub.model.ticket.TicketModel
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor

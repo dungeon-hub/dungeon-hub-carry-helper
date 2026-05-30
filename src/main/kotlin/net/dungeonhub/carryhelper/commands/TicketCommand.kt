@@ -1,8 +1,8 @@
-package net.dungeonhub.carryhelper.client.commands
+package net.dungeonhub.carryhelper.commands
 
 import com.mojang.brigadier.context.CommandContext
-import net.dungeonhub.carryhelper.client.auth.AuthenticationHandler.requireLogin
-import net.dungeonhub.carryhelper.client.features.overlay.TicketOverlayFeature
+import net.dungeonhub.carryhelper.auth.AuthenticationHandler.requireLogin
+import net.dungeonhub.carryhelper.features.overlay.TicketOverlayFeature
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import net.minecraft.network.chat.Component
 

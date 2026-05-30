@@ -1,6 +1,6 @@
-package net.dungeonhub.carryhelper.mixin.client;
+package net.dungeonhub.carryhelper.mixin;
 
-import net.dungeonhub.carryhelper.client.features.overlay.TicketOverlayFeature;
+import net.dungeonhub.carryhelper.features.overlay.TicketOverlayFeature;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphicsExtractor;

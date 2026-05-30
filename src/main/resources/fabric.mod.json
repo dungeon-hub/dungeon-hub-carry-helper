@@ -13,7 +13,7 @@
     "client": [
       {
         "adapter": "kotlin",
-        "value": "net.dungeonhub.carryhelper.client.DhCarryHelperClient"
+        "value": "net.dungeonhub.carryhelper.DhCarryHelper"
       }
     ],
     "modmenu": [
@@ -21,9 +21,8 @@
     ]
   },
   "mixins": [
-    "dh-carry-helper.mixins.json",
     {
-      "config": "dh-carry-helper.client.mixins.json",
+      "config": "dh-carry-helper.mixins.json",
       "environment": "client"
     }
   ],

@@ -1,7 +1,7 @@
-package net.dungeonhub.carryhelper.client.logging
+package net.dungeonhub.carryhelper.logging
 
 import com.mojang.brigadier.context.CommandContext
-import net.dungeonhub.carryhelper.client.auth.AuthenticationHandler.requireLogin
+import net.dungeonhub.carryhelper.auth.AuthenticationHandler.requireLogin
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import net.minecraft.network.chat.Component
 

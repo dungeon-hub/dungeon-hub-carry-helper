@@ -1,11 +1,11 @@
-package net.dungeonhub.carryhelper.client.service
+package net.dungeonhub.carryhelper.service
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import net.dungeonhub.carryhelper.client.auth.AuthenticationHandler
+import net.dungeonhub.carryhelper.auth.AuthenticationHandler
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest

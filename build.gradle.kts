@@ -26,14 +26,7 @@ java {
 }
 
 loom {
-    splitEnvironmentSourceSets()
-
-    mods {
-        register("dh-carry-helper") {
-            sourceSet("main")
-            sourceSet("client")
-        }
-    }
+    
 }
 
 fabricApi {
@@ -147,9 +140,6 @@ tasks.jar {
 tasks.shadowJar {
     archiveClassifier.set("") // No classifier so it becomes the main jar
     configurations = listOf(project.configurations.shadow.get())
-
-    // Include client resources
-    from(sourceSets["client"].output)
 
     // Exclude ONLY libraries provided by fabric-language-kotlin
     exclude("org/jetbrains/kotlin/**")

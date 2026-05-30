@@ -1,4 +1,4 @@
-package net.dungeonhub.carryhelper.client.auth
+package net.dungeonhub.carryhelper.auth
 
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject

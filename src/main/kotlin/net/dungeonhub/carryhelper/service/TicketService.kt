@@ -1,8 +1,8 @@
-package net.dungeonhub.carryhelper.client.service
+package net.dungeonhub.carryhelper.service
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import net.dungeonhub.carryhelper.client.auth.AuthenticationHandler
+import net.dungeonhub.carryhelper.auth.AuthenticationHandler
 import net.dungeonhub.connection.CarryDifficultyConnection
 import net.dungeonhub.connection.DiscordUserConnection
 import net.dungeonhub.model.carry_difficulty.CarryDifficultyModel
@@ -90,7 +90,9 @@ object TicketService {
                 val carryTier = ticket.ticketPanel.relatedCarryTier ?: continue
 
                 if(!carryDifficulties.containsKey(carryTier.id)) {
-                    val loadedCarryDifficulties = CarryDifficultyConnection[carryTier].authenticated(AuthenticationHandler).getAllCarryDifficulties() ?: continue
+                    val loadedCarryDifficulties = CarryDifficultyConnection.Companion[carryTier].authenticated(
+                        AuthenticationHandler
+                    ).getAllCarryDifficulties() ?: continue
                     carryDifficulties[carryTier.id] = loadedCarryDifficulties
                 }
             }

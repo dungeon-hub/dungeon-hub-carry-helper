@@ -1,17 +1,20 @@
 package net.dungeonhub.carryhelper.service
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import net.dungeonhub.carryhelper.auth.AuthenticationHandler
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.Executors
 
 object MojangService {
     private val httpClient = HttpClient.newHttpClient()
@@ -19,6 +22,11 @@ object MojangService {
     private val profileCache = ConcurrentHashMap<UUID, String>()
     private val fetchingByUuid = ConcurrentHashMap<UUID, Boolean>()
     private val fetchingByName = ConcurrentHashMap<String, Boolean>()
+
+    private val supervisor = SupervisorJob()
+    private val dispatcher = Executors.newFixedThreadPool(2).asCoroutineDispatcher()
+
+    private val scheduler = CoroutineScope(supervisor + dispatcher)
 
     fun getPlayerName(uuid: UUID?): String {
         if (uuid == null) return "Unknown"
@@ -53,7 +61,7 @@ object MojangService {
     }
 
     private fun fetchByUuid(uuid: UUID) {
-        AuthenticationHandler.scheduler.launch {
+        scheduler.launch {
             try {
                 val uuidString = uuid.toString().replace("-", "")
                 val url = "https://api.minecraftservices.com/minecraft/profile/lookup/$uuidString"
@@ -83,7 +91,7 @@ object MojangService {
     }
 
     private fun fetchByName(name: String) {
-        AuthenticationHandler.scheduler.launch {
+        scheduler.launch {
             try {
                 val url = "https://api.minecraftservices.com/minecraft/profile/lookup/name/$name"
 

@@ -1,6 +1,10 @@
 package net.dungeonhub.carryhelper
 
 import com.teamresourceful.resourcefulconfig.api.loader.Configurator
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.dungeonhub.carryhelper.auth.AuthenticationHandler
 import net.dungeonhub.carryhelper.commands.TicketCommand
@@ -15,6 +19,8 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLevelEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.loader.api.FabricLoader
+import java.util.concurrent.Executors
+import kotlin.time.Duration.Companion.milliseconds
 
 object DhCarryHelper : ClientModInitializer {
     const val MOD_ID = "dh-carry-helper"
@@ -26,6 +32,11 @@ object DhCarryHelper : ClientModInitializer {
     val authConfig = AuthConfig.register(configurator)
 
     val isDev = FabricLoader.getInstance().isDevelopmentEnvironment
+
+    private val supervisor = SupervisorJob()
+    private val dispatcher = Executors.newFixedThreadPool(1).asCoroutineDispatcher()
+
+    private val scheduler = CoroutineScope(supervisor + dispatcher)
 
     override fun onInitializeClient() {
         version = FabricLoader.getInstance().getModContainer(MOD_ID)
@@ -62,8 +73,11 @@ object DhCarryHelper : ClientModInitializer {
         }
 
         ClientLevelEvents.AFTER_CLIENT_LEVEL_CHANGE.register { _, _ ->
-            AuthenticationHandler.scheduler.launch {
+            scheduler.launch {
                 AuthenticationHandler.setup()
+                while(!AuthenticationHandler.isValid()) {
+                    delay(100.milliseconds)
+                }
                 TicketService.initialize()
             }
         }

@@ -3,10 +3,16 @@
   "id": "dh-carry-helper",
   "version": "${version}",
   "name": "Dungeon Hub Carry Helper",
-  "description": "",
-  "authors": [],
-  "contact": {},
-  "license": "All-Rights-Reserved",
+  "description": "This mod helps you run carries with the Dungeon Hub discord bot.",
+  "authors": [
+    "Taubsie"
+  ],
+  "contact": {
+    "homepage": "https://dungeon-hub.net/",
+    "discord": "https://discord.dungeon-hub.net/",
+    "sources": "https://github.com/dungeon-hub/dungeon-hub-carry-helper/"
+  },
+  "license": "EUPL-1.2",
   "icon": "assets/dh-carry-helper/icon.png",
   "environment": "client",
   "entrypoints": {
@@ -32,5 +38,12 @@
     "fabric-api": "*",
     "minecraft": "${minecraft_version}",
     "resourcefulconfig": ">=4.0.1"
+  },
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.discord": "https://discord.dungeon-hub.net/"
+      }
+    }
   }
 }

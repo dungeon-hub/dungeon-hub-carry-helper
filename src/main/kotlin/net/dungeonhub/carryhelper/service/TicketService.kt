@@ -1,5 +1,8 @@
 package net.dungeonhub.carryhelper.service
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.dungeonhub.carryhelper.auth.AuthenticationHandler
@@ -13,6 +16,7 @@ import net.minecraft.network.chat.ClickEvent
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.Executors
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
@@ -28,11 +32,16 @@ object TicketService {
 
     private const val FETCH_INTERVAL = 15
 
+    private val supervisor = SupervisorJob()
+    private val dispatcher = Executors.newFixedThreadPool(2).asCoroutineDispatcher()
+
+    private val scheduler = CoroutineScope(supervisor + dispatcher)
+
     fun initialize() {
         if (isRunning) return
         isRunning = true
 
-        AuthenticationHandler.scheduler.launch {
+        scheduler.launch {
             while (isRunning) {
                 if (AuthenticationHandler.isValid()) {
                     fetchTickets()
@@ -56,7 +65,7 @@ object TicketService {
         if (!AuthenticationHandler.isValid()) return
 
         isFetching = true
-        AuthenticationHandler.scheduler.launch {
+        scheduler.launch {
             try {
                 val tickets = DiscordUserConnection.authenticated(AuthenticationHandler).getMyClaimedTickets() ?: emptyList()
 

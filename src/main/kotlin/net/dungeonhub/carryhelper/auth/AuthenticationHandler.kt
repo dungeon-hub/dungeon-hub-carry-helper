@@ -1,6 +1,7 @@
 package net.dungeonhub.carryhelper.auth
 
 import com.mojang.brigadier.context.CommandContext
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -63,7 +64,7 @@ object AuthenticationHandler : AuthenticationProvider {
     private val supervisor = SupervisorJob()
     private val dispatcher = Executors.newFixedThreadPool(2).asCoroutineDispatcher()
 
-    val scheduler = CoroutineScope(supervisor + dispatcher)
+    private val scheduler = CoroutineScope(supervisor + dispatcher)
 
     fun shutdown() {
         scheduler.cancel()
@@ -202,8 +203,8 @@ object AuthenticationHandler : AuthenticationProvider {
 
                         delay(30.seconds)
                     }
-
                 } catch (exception: Exception) {
+                    if(exception is CancellationException) return@launch
                     logger.error("[CH] Failed to refresh access token!", exception)
                 }
             }

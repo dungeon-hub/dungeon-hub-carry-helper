@@ -16,9 +16,21 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.loader.api.FabricLoader
 
-class DhCarryHelperClient : ClientModInitializer {
+object DhCarryHelperClient : ClientModInitializer {
+    const val MOD_ID = "dh-carry-helper"
+
+    lateinit var version: String
+
+    val configurator = Configurator(MOD_ID)
+
+    val authConfig = AuthConfig.register(configurator)
+
+    val isDev = FabricLoader.getInstance().isDevelopmentEnvironment
+
     override fun onInitializeClient() {
-        configurator.register(AuthConfig.javaClass)
+        version = FabricLoader.getInstance().getModContainer(MOD_ID)
+            .map { it.metadata.version.friendlyString }
+            .orElse("unknown")!!
 
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
             dispatcher.register(
@@ -64,15 +76,5 @@ class DhCarryHelperClient : ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register {
             SlayerBossFeature.onTick()
         }
-    }
-
-    companion object {
-        val configurator = Configurator("dh-carry-helper")
-
-        fun saveConfig() {
-            configurator.saveConfig(AuthConfig.javaClass)
-        }
-
-        val isDev = FabricLoader.getInstance().isDevelopmentEnvironment
     }
 }

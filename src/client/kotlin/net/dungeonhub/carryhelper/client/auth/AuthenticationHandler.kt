@@ -83,7 +83,7 @@ object AuthenticationHandler : AuthenticationProvider {
         DungeonHubClient.cdnUrl = AuthConfig.apiUrl + "cdn/"
         DungeonHubClient.staticUrl = AuthConfig.apiUrl + "cdn/static/"
 
-        if(AuthConfig.getOfflineToken() != null) {
+        if(AuthConfig.offlineToken != null) {
             startAccessTokenRefresh()
         } else {
             loadDeviceAuthorizationCodes()
@@ -122,7 +122,7 @@ object AuthenticationHandler : AuthenticationProvider {
                     val offlineToken = result.data.refreshToken
 
                     AuthConfig.offlineToken = offlineToken
-                    DhCarryHelperClient.saveConfig()
+                    DhCarryHelperClient.authConfig.save()
 
                     val claims = JwtDecoder.parseJwtClaims(result.data.accessToken)
 

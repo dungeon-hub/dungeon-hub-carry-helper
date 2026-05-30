@@ -1,22 +1,28 @@
 package net.dungeonhub.carryhelper.client.config
 
-import com.teamresourceful.resourcefulconfig.api.annotations.Config
-import com.teamresourceful.resourcefulconfig.api.annotations.ConfigEntry
+import com.teamresourceful.resourcefulconfig.api.types.options.TranslatableValue
+import com.teamresourceful.resourcefulconfigkt.api.ConfigKt
+import net.dungeonhub.carryhelper.client.DhCarryHelperClient
 
-// TODO use the kt config variant - then we can remove the jvm field annotation
-@Config(value = "dh-carry-helper/auth")
-object AuthConfig {
-    @JvmField
-    @ConfigEntry(id = "api_url", translation = "API URL")
-    var apiUrl: String = "https://api.dungeon-hub.net/"
+object AuthConfig : ConfigKt("${DhCarryHelperClient.MOD_ID}/auth") {
+    override val name: TranslatableValue
+        get() = Literal("DH Carry Helper ${DhCarryHelperClient.version}")
 
-    @JvmField
-    @ConfigEntry(id = "auth_url", translation = "Auth URL")
-    var authUrl: String = "https://auth.dungeon-hub.net/realms/dungeon-hub/"
+    var apiUrl by string("api_url", "https://api.dungeon-hub.net/") {
+        name = Literal("API URL")
+    }
 
-    @JvmField
-    @ConfigEntry(id = "api_token", translation = "API Token")
-    var offlineToken: String = ""
+    var authUrl by string("auth_url", "https://auth.dungeon-hub.net/realms/dungeon-hub/") {
+        name = Literal("Auth URL")
+    }
 
-    fun getOfflineToken(): String? = offlineToken.takeIf { it.isNotBlank() }
+    private var _offlineToken by string("api_token", "") {
+        name = Literal("API Token")
+    }
+
+    var offlineToken: String?
+        get() = _offlineToken.takeIf { it.isNotBlank() }
+        set(value) {
+            _offlineToken = value ?: ""
+        }
 }

@@ -1,6 +1,6 @@
 package net.dungeonhub.carryhelper.mixin.client;
 
-import net.dungeonhub.carryhelper.client.slayer.SlayerBossFeature;
+import net.dungeonhub.carryhelper.client.features.slayer.SlayerBossFeature;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.phys.HitResult;
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,7 +15,7 @@ public class ClickMixin {
     public HitResult hitResult;
 
     @Shadow
-    private int missTime;
+    public int missTime;
 
     @Inject(at = @At("HEAD"), method = "startAttack")
     public void handleLeftClickMouse(CallbackInfoReturnable<Boolean> cir) {

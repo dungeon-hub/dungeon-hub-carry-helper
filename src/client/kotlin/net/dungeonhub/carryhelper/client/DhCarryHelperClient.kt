@@ -7,11 +7,13 @@ import net.dungeonhub.carryhelper.client.commands.TicketCommand
 import net.dungeonhub.carryhelper.client.config.AuthConfig
 import net.dungeonhub.carryhelper.client.logging.LogCommand
 import net.dungeonhub.carryhelper.client.service.TicketService
+import net.dungeonhub.carryhelper.client.features.slayer.SlayerBossFeature
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 import net.fabricmc.fabric.api.client.command.v2.ClientCommands
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLevelEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.loader.api.FabricLoader
 
 class DhCarryHelperClient : ClientModInitializer {
@@ -57,6 +59,10 @@ class DhCarryHelperClient : ClientModInitializer {
         ClientLifecycleEvents.CLIENT_STOPPING.register {
             TicketService.shutdown()
             AuthenticationHandler.shutdown()
+        }
+
+        ClientTickEvents.END_CLIENT_TICK.register {
+            SlayerBossFeature.onTick()
         }
     }
 

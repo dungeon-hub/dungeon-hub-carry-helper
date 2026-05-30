@@ -5,6 +5,7 @@ plugins {
     kotlin("jvm") version "2.3.21"
     kotlin("plugin.serialization") version "2.3.21"
     id("net.fabricmc.fabric-loom") version "1.16-SNAPSHOT"
+    id("com.gradleup.shadow") version "9.4.2"
     id("maven-publish")
 }
 
@@ -58,13 +59,13 @@ repositories {
         }
     }
 
-    maven("https://snapshots-repo.kordex.dev") {
+    /*maven("https://snapshots-repo.kordex.dev") {
         name = "KordEx Snapshot Repository"
         content {
             includeGroup("com.kotlindiscord")
             includeGroup("dev.kordex")
         }
-    }
+    }*/
 
     maven("https://repo.kordex.dev/mirror") {
         name = "Kord Mirror Repository"
@@ -83,20 +84,26 @@ dependencies {
     implementation("net.fabricmc.fabric-api:fabric-api:${project.property("fabric_version")}")
 
     implementation("com.teamresourceful.resourcefulconfig:resourcefulconfig-fabric-26.1:4.0.1")
+    implementation("com.teamresourceful.resourcefulconfigkt:resourcefulconfigkt-26.1-rc-1:4.0.0-beta.1")
 
-    api("net.dungeon-hub.api:client:0.7.0")
-    include("net.dungeon-hub.api:client:0.7.0")
-    api("io.ktor:ktor-client-java:3.0.0")
-    include("io.ktor:ktor-client-java:3.0.0")
-    api("dev.kord:kord-core:0.19.0-SNAPSHOT")
-    include("dev.kord:kord-core:0.19.0-SNAPSHOT")
-    api("dev.kordex:kord-extensions:2.4.1-SNAPSHOT")
-    include("dev.kordex:kord-extensions:2.4.1-SNAPSHOT")
-    api("com.squareup.okhttp3:okhttp:4.12.0")
-    include("com.squareup.okhttp3:okhttp:4.12.0")
+    val apiClient = "net.dungeon-hub.api:client:0.7.0"
+    implementation(apiClient)
+    shadow(apiClient) {
+        isTransitive = true // Include all transitive dependencies
+    }
 
-    api("com.auth0:java-jwt:4.5.2")
-    include("com.auth0:java-jwt:4.5.2")
+    // Explicitly include kord-core as it's needed by the API but marked as implementation/compileOnly
+    val kordCore = "dev.kord:kord-core:0.19.0-SNAPSHOT"
+    implementation(kordCore)
+    shadow(kordCore) {
+        isTransitive = true
+    }
+
+    val kordExTranslations = "dev.kordex.i18n:i18n:1.1.1"
+    implementation(kordExTranslations)
+    shadow(kordExTranslations) {
+        isTransitive = true
+    }
 
     runtimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.2")
 }
@@ -134,6 +141,61 @@ tasks.jar {
     from("LICENSE") {
         rename { "${it}_${project.base.archivesName.get()}" }
     }
+}
+
+// Configure shadow jar to bundle dependencies
+tasks.shadowJar {
+    archiveClassifier.set("") // No classifier so it becomes the main jar
+    configurations = listOf(project.configurations.shadow.get())
+
+    // Include client resources
+    from(sourceSets["client"].output)
+
+    // Exclude ONLY libraries provided by fabric-language-kotlin
+    exclude("org/jetbrains/kotlin/**")
+    exclude("kotlin/**")
+    exclude("kotlinx/coroutines/**")
+    exclude("kotlinx/serialization/**")
+    exclude("kotlinx/atomicfu/**")
+    exclude("kotlinx/datetime/**")
+    exclude("kotlinx/io/**")
+
+    // Exclude unnecessary libraries
+    exclude("io/swagger/**")
+    exclude("org/jetbrains/annotations/**")
+    exclude("org/intellij/**")
+    exclude("com/google/errorprone/**")
+
+    // Relocate ALL other dependencies to avoid conflicts
+    relocate("com.squareup.moshi", "net.dungeonhub.carryhelper.libs.moshi")
+    relocate("com.squareup.okio", "net.dungeonhub.carryhelper.libs.okio")
+    relocate("okio", "net.dungeonhub.carryhelper.libs.okio")
+    relocate("okhttp3", "net.dungeonhub.carryhelper.libs.okhttp3")
+    relocate("io.ktor", "net.dungeonhub.carryhelper.libs.ktor")
+    relocate("com.hypercubetools", "net.dungeonhub.carryhelper.libs.hypercubetools")
+    relocate("com.google.gson", "net.dungeonhub.carryhelper.libs.gson")
+    relocate("com.fasterxml.jackson", "net.dungeonhub.carryhelper.libs.jackson")
+    relocate("jakarta", "net.dungeonhub.carryhelper.libs.jakarta")
+    relocate("org.apache.commons", "net.dungeonhub.carryhelper.libs.apache.commons")
+    relocate("org.yaml.snakeyaml", "net.dungeonhub.carryhelper.libs.snakeyaml")
+    relocate("org.slf4j", "net.dungeonhub.carryhelper.libs.slf4j")
+    relocate("dev.kord", "net.dungeonhub.carryhelper.libs.kord")
+    relocate("dev.kordex.i18n", "net.dungeonhub.carryhelper.libs.kordex-i18n")
+    relocate("io.github.oshai.kotlinlogging", "net.dungeonhub.carryhelper.libs.kotlinlogging")
+
+    from("LICENSE") {
+        rename { "${it}_${project.base.archivesName.get()}" }
+    }
+}
+
+// Make jar task depend on shadowJar
+tasks.jar {
+    dependsOn(tasks.shadowJar)
+    enabled = false // Disable regular jar, use shadow jar instead
+}
+
+tasks.build {
+    dependsOn(tasks.shadowJar)
 }
 
 // configure the maven publication

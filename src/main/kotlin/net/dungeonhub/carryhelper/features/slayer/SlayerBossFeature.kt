@@ -108,13 +108,5 @@ object SlayerBossFeature {
                 Component.literal("[CH] Slayer boss from $spawner was killed!").setStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW))
             )
         }
-
-        // TODO implement logging tickets
-        /* TODO open features:
-        - a possible way to show the ticket name ingame (the bot loads all channels on a server and writes their current names to the DB)
-        - a way for the bot to send a message --> a kind of update queue that simply stores what kind of entity needs updating, an optional data JSON object and a status
-        - linking carry difficulty to ingame carry types --> have a really large enum with all possible carry types?
-        - logging a carry using the above ingame carry type --> theoretically, this should be easy to do
-         */
     }
 }

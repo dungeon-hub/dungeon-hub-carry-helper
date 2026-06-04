@@ -1,5 +1,6 @@
 package net.dungeonhub.carryhelper
 
+import com.teamresourceful.resourcefulconfig.api.client.ResourcefulConfigScreen
 import com.teamresourceful.resourcefulconfig.api.loader.Configurator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -19,6 +20,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLevelEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.loader.api.FabricLoader
+import net.minecraft.client.Minecraft
 import java.util.concurrent.Executors
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -42,6 +44,18 @@ object DhCarryHelper : ClientModInitializer {
         version = FabricLoader.getInstance().getModContainer(MOD_ID)
             .map { it.metadata.version.friendlyString }
             .orElse("unknown")!!
+
+        ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
+            dispatcher.register(
+                ClientCommands.literal("carry-helper")
+                    .executes {
+                        Minecraft.getInstance().schedule {
+                            Minecraft.getInstance().setScreen(ResourcefulConfigScreen.getFactory(MOD_ID).apply(null))
+                        }
+                        return@executes 1
+                    }
+            )
+        }
 
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
             dispatcher.register(

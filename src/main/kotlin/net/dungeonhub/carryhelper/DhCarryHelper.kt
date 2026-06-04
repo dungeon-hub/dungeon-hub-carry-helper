@@ -8,7 +8,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.dungeonhub.carryhelper.auth.AuthenticationHandler
 import net.dungeonhub.carryhelper.commands.TicketCommand
-import net.dungeonhub.carryhelper.config.AuthConfig
+import net.dungeonhub.carryhelper.config.Config
 import net.dungeonhub.carryhelper.logging.LogCommand
 import net.dungeonhub.carryhelper.service.TicketService
 import net.dungeonhub.carryhelper.features.slayer.SlayerBossFeature
@@ -29,7 +29,7 @@ object DhCarryHelper : ClientModInitializer {
 
     val configurator = Configurator(MOD_ID)
 
-    val authConfig = AuthConfig.register(configurator)
+    val config = Config.register(configurator)
 
     val isDev = FabricLoader.getInstance().isDevelopmentEnvironment
 

@@ -60,6 +60,8 @@ object TicketOverlayFeature {
     }
 
     private fun formatTicketName(ticket: TicketModel): String {
+        val channelName = ticket.channel?.name ?: "unknown"
+
         val carryTier = ticket.ticketPanel.relatedCarryTier!!
         val carryTierName = ticket.ticketPanel.relatedCarryTier?.descriptiveName ?: "Unknown"
 
@@ -75,7 +77,7 @@ object TicketOverlayFeature {
         } ?: ticket.ticketPanel.relatedCarryDifficulty?.displayName
         ?: "?"
 
-        return "$playerName: $amount $carryTierName - $carryDifficulty"
+        return "$channelName: $playerName wants $amount $carryTierName - $carryDifficulty"
     }
 
     fun toggle() {

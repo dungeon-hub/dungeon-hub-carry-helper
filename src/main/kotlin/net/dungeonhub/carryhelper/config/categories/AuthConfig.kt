@@ -14,8 +14,7 @@ object AuthConfig : CategoryKt("$MOD_ID/auth") {
 
     var extendedDebug by boolean("extended_debug", false) {
         name = Literal("Extended Debug output")
-        description = Literal("This increases the amount of information sent to you ingame.\n" +
-                "WARNING: When the mod runs into an error, it will crash the game instead of showing you the error.")
+        description = Literal("This increases the amount of information sent to you ingame.")
     }
 
     var apiUrl by string("api_url", "https://api.dungeon-hub.net/") {

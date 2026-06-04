@@ -10,8 +10,14 @@ import org.slf4j.Logger
 
 object MessageUtil {
     fun Logger.sendDevError(message: String) {
-        if (DhCarryHelper.isDev || AuthConfig.extendedDebug) {
+        if (DhCarryHelper.isDev) {
             throw RuntimeException(message)
+        } else if (AuthConfig.extendedDebug) {
+            Minecraft.getInstance().execute {
+                Minecraft.getInstance().gui.chat.addClientSystemMessage(
+                    Component.literal(message).setStyle(Style.EMPTY.withColor(ChatFormatting.RED))
+                )
+            }
         } else {
             error(message)
         }

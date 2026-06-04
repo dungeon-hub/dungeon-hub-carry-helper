@@ -77,12 +77,16 @@ dependencies {
     implementation("net.fabricmc.fabric-api:fabric-api:${project.property("fabric_version")}")
 
     implementation("com.teamresourceful.resourcefulconfig:resourcefulconfig-fabric-26.1:4.0.1")
-    implementation("com.teamresourceful.resourcefulconfigkt:resourcefulconfigkt-26.1-rc-1:4.0.0-beta.1")
+    val resourcefulConfigKt = "com.teamresourceful.resourcefulconfigkt:resourcefulconfigkt-26.1-rc-1:4.0.0-beta.1"
+    implementation(resourcefulConfigKt)
+    shadow(resourcefulConfigKt) { // TODO just use the dependency on the mod once (if) it becomes available on Modrinth
+        isTransitive = false
+    }
 
     val apiClient = "net.dungeon-hub.api:client:0.7.0"
     implementation(apiClient)
     shadow(apiClient) {
-        isTransitive = true // Include all transitive dependencies
+        isTransitive = true
     }
 
     // Explicitly include kord-core as it's needed by the API but marked as implementation/compileOnly
@@ -99,6 +103,10 @@ dependencies {
     }
 
     runtimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.2")
+
+    //Testing
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.10.1")
+    testImplementation(kotlin("test"))
 }
 
 tasks.processResources {
@@ -172,6 +180,7 @@ tasks.shadowJar {
     relocate("dev.kord", "net.dungeonhub.carryhelper.libs.kord")
     relocate("dev.kordex.i18n", "net.dungeonhub.carryhelper.libs.kordex-i18n")
     relocate("io.github.oshai.kotlinlogging", "net.dungeonhub.carryhelper.libs.kotlinlogging")
+    relocate("com.teamresourceful.resourcefulconfigkt", "net.dungeonhub.carryhelper.libs.resourcefulconfigkt")
 
     from("LICENSE") {
         rename { "${it}_${project.base.archivesName.get()}" }

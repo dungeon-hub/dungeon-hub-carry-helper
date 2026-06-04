@@ -21,7 +21,6 @@ import kotlin.time.Clock
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 
-// TODO use carryDifficultyConnection.findCarryDifficultyByString(value) or even better carryDifficultyConnection.getByIdentifier(value) to load the carry difficulty and use the proper display name instead of just the identifier
 object TicketService {
     private var claimedTickets: List<TicketModel>? = null
     var carryDifficulties: MutableMap<Long, List<CarryDifficultyModel>> = ConcurrentHashMap()
@@ -71,9 +70,10 @@ object TicketService {
 
                 for(newTicket in tickets) {
                     if(claimedTickets != null && newTicket.id !in claimedTickets!!.map { it.id }) {
-                        val ign = newTicket.user.minecraftId?.let {
-                            MojangService.getPlayerName(it)
-                        } ?: continue
+                        val uuid = newTicket.user.minecraftId ?: continue
+                        if(Minecraft.getInstance().isLocalPlayer(uuid)) continue
+
+                        val ign = MojangService.awaitPlayerName(uuid) ?: continue
 
                         // A lot of credit and thanks to StrykerAW (383819291687911424) for the suggestion!
                         Minecraft.getInstance().execute {

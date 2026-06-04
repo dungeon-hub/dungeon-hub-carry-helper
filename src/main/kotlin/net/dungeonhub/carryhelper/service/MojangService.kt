@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
@@ -15,6 +16,8 @@ import java.net.http.HttpResponse
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 object MojangService {
     private val httpClient = HttpClient.newHttpClient()
@@ -28,9 +31,7 @@ object MojangService {
 
     private val scheduler = CoroutineScope(supervisor + dispatcher)
 
-    fun getPlayerName(uuid: UUID?): String {
-        if (uuid == null) return "Unknown"
-
+    fun getPlayerName(uuid: UUID): String? {
         // Check cache first
         profileCache[uuid]?.let { return it }
 
@@ -39,8 +40,15 @@ object MojangService {
             fetchByUuid(uuid)
         }
 
-        // Return truncated UUID while loading
-        return uuid.toString().substring(0, 8)
+        return null
+    }
+
+    suspend fun awaitPlayerName(uuid: UUID, maxRetries: Int = 10, delayDuration: Duration = 100.milliseconds): String? {
+        repeat(maxRetries) {
+            getPlayerName(uuid)?.let { return it }
+            delay(delayDuration)
+        }
+        return null
     }
 
     fun getPlayerUuid(name: String): UUID? {

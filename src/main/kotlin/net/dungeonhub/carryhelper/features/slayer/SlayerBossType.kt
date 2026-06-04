@@ -2,7 +2,6 @@ package net.dungeonhub.carryhelper.features.slayer
 
 import net.dungeonhub.enums.IngameCarryType
 
-// TODO complete
 enum class SlayerBossType(val slayerName: String, val ingameCarryType: IngameCarryType) {
     Revenant1("Revenant Horror I", IngameCarryType.Revenant1),
     Revenant2("Revenant Horror II", IngameCarryType.Revenant2),

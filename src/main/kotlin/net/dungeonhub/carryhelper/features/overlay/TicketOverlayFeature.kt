@@ -65,7 +65,12 @@ object TicketOverlayFeature {
         val carryTier = ticket.ticketPanel.relatedCarryTier!!
         val carryTierName = ticket.ticketPanel.relatedCarryTier?.descriptiveName ?: "Unknown"
 
-        val playerName = MojangService.getPlayerName(ticket.user.minecraftId)
+        val playerUuid = ticket.user.minecraftId
+        val playerName = if(playerUuid != null) {
+            MojangService.getPlayerName(playerUuid) ?: playerUuid.toString().substring(0, 8)
+        } else {
+            "Unknown"
+        }
         val amount = ticket.formResponses.firstOrNull { it.customId == "carry-amount" }?.value ?: "?"
 
         val carryDifficulty = ticket.formResponses.firstOrNull { formResponse ->

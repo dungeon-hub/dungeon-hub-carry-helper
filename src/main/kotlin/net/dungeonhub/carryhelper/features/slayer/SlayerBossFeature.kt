@@ -157,7 +157,6 @@ object SlayerBossFeature {
             return
         }
 
-        // TODO for testing purposes, we always send a message; once the feature is fully tested, use the debug again
         logger.sendDebug("[CH] Slayer boss from ${slayerBoss.spawner} was killed!")
 
         val claimedTickets = TicketService.getClaimedTickets() ?: return
@@ -212,7 +211,7 @@ object SlayerBossFeature {
                             createdQueues.joinToString(", ") {
                                 it.player.minecraftId?.let {
                                     MojangService.getPlayerName(it)
-                                } ?: "unknown"
+                                } ?: "Unknown"
                             }
                         } automatically!").setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN))
                     )

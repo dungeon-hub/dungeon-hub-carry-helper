@@ -16,7 +16,7 @@ import kotlinx.serialization.json.Json
 import net.dungeonhub.auth.AuthenticationProvider
 import net.dungeonhub.carryhelper.DhCarryHelper
 import net.dungeonhub.carryhelper.util.MessageUtil.sendDevError
-import net.dungeonhub.carryhelper.config.AuthConfig
+import net.dungeonhub.carryhelper.config.categories.AuthConfig
 import net.dungeonhub.client.DungeonHubClient
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import net.minecraft.ChatFormatting
@@ -123,7 +123,7 @@ object AuthenticationHandler : AuthenticationProvider {
                     val offlineToken = result.data.refreshToken
 
                     AuthConfig.offlineToken = offlineToken
-                    DhCarryHelper.authConfig.save()
+                    DhCarryHelper.config.save()
 
                     val claims = JwtDecoder.parseJwtClaims(result.data.accessToken)
 

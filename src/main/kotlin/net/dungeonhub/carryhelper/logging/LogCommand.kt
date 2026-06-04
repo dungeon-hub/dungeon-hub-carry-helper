@@ -11,7 +11,7 @@ object LogCommand {
             return 1
         }
 
-        context.source.sendFeedback(Component.literal("Called /dedicated_command."))
+        context.source.sendFeedback(Component.literal("Manual logging isn't implemented yet. Please use /log on discord manually."))
         return 1
     }
 }

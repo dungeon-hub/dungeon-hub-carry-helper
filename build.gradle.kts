@@ -182,6 +182,8 @@ tasks.shadowJar {
     from("LICENSE") {
         rename { "${it}_${project.base.archivesName.get()}" }
     }
+
+    archiveClassifier = project.property("minecraft_version").toString()
 }
 
 // Make jar task depend on shadowJar

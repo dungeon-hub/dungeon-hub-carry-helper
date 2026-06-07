@@ -28,3 +28,10 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew build test
+
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: mod-jars
+          path: |
+            build/libs

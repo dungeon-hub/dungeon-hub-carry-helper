@@ -17,7 +17,7 @@ object TicketCategory : CategoryKt("$MOD_ID/tickets") {
 
     var ticketRefreshCooldown by int("ticket_refresh_cooldown", 15) {
         name = Literal("Ticket refresh cooldown")
-        description = Literal("Change after how many seconds the tickets are reloaded from discord. A higher value means that you use more bandwidth, but you will also see updates slower.")
+        description = Literal("Change after how many seconds the tickets are reloaded from discord. A higher value means that you use less bandwidth, but you will also see updates slower.")
         range = ticketRefreshCooldownRange
         slider = true
     }

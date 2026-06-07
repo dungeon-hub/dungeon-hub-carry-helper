@@ -1,7 +1,7 @@
 package net.dungeonhub.carryhelper.util
 
 import net.dungeonhub.carryhelper.DhCarryHelper
-import net.dungeonhub.carryhelper.config.categories.AuthConfig
+import net.dungeonhub.carryhelper.config.categories.DevCategory
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
@@ -12,7 +12,7 @@ object MessageUtil {
     fun Logger.sendDevError(message: String) {
         if (DhCarryHelper.isDev) {
             throw RuntimeException(message)
-        } else if (AuthConfig.extendedDebug) {
+        } else if (DevCategory.extendedDebug) {
             Minecraft.getInstance().execute {
                 Minecraft.getInstance().gui.chat.addClientSystemMessage(
                     Component.literal(message).setStyle(Style.EMPTY.withColor(ChatFormatting.RED))
@@ -24,7 +24,7 @@ object MessageUtil {
     }
 
     fun Logger.sendDevDebug(message: String) {
-        if (DhCarryHelper.isDev || AuthConfig.extendedDebug) {
+        if (DhCarryHelper.isDev || DevCategory.extendedDebug) {
             Minecraft.getInstance().execute {
                 Minecraft.getInstance().gui.chat.addClientSystemMessage(
                     Component.literal(message).setStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW))
@@ -36,7 +36,7 @@ object MessageUtil {
     }
 
     fun Logger.sendDebug(message: String) {
-        if (DhCarryHelper.isDev || AuthConfig.extendedDebug) {
+        if (DhCarryHelper.isDev || DevCategory.extendedDebug) {
             Minecraft.getInstance().execute {
                 Minecraft.getInstance().gui.chat.addClientSystemMessage(
                     Component.literal(message).setStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW))

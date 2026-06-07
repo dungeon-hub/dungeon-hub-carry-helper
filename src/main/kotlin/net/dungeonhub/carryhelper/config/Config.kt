@@ -4,7 +4,8 @@ import com.teamresourceful.resourcefulconfig.api.types.options.TranslatableValue
 import com.teamresourceful.resourcefulconfigkt.api.ConfigKt
 import net.dungeonhub.carryhelper.DhCarryHelper
 import net.dungeonhub.carryhelper.DhCarryHelper.MOD_ID
-import net.dungeonhub.carryhelper.config.categories.AuthConfig
+import net.dungeonhub.carryhelper.config.categories.DevCategory
+import net.dungeonhub.carryhelper.config.categories.TicketCategory
 import net.minecraft.util.Util
 
 object Config : ConfigKt("$MOD_ID/config") {
@@ -55,6 +56,7 @@ object Config : ConfigKt("$MOD_ID/config") {
     }
 
     init {
-        category(AuthConfig)
+        category(TicketCategory)
+        category(DevCategory)
     }
 }

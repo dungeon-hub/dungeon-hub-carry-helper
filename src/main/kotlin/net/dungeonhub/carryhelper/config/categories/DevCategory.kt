@@ -5,7 +5,7 @@ import com.teamresourceful.resourcefulconfigkt.api.CategoryKt
 import net.dungeonhub.carryhelper.DhCarryHelper.MOD_ID
 import net.dungeonhub.carryhelper.config.Config
 
-object AuthConfig : CategoryKt("$MOD_ID/auth") {
+object DevCategory : CategoryKt("$MOD_ID/auth") {
     override val name: TranslatableValue
         get() = Literal("Developer")
 

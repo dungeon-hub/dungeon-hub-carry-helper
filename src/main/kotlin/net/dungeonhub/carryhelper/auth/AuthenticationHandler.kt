@@ -16,7 +16,7 @@ import kotlinx.serialization.json.Json
 import net.dungeonhub.auth.AuthenticationProvider
 import net.dungeonhub.carryhelper.DhCarryHelper
 import net.dungeonhub.carryhelper.util.MessageUtil.sendDevError
-import net.dungeonhub.carryhelper.config.categories.AuthConfig
+import net.dungeonhub.carryhelper.config.categories.DevCategory
 import net.dungeonhub.client.DungeonHubClient
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import net.minecraft.ChatFormatting
@@ -80,11 +80,11 @@ object AuthenticationHandler : AuthenticationProvider {
     }
 
     suspend fun setup() {
-        DungeonHubClient.apiUrl = AuthConfig.apiUrl
-        DungeonHubClient.cdnUrl = AuthConfig.apiUrl + "cdn/"
-        DungeonHubClient.staticUrl = AuthConfig.apiUrl + "cdn/static/"
+        DungeonHubClient.apiUrl = DevCategory.apiUrl
+        DungeonHubClient.cdnUrl = DevCategory.apiUrl + "cdn/"
+        DungeonHubClient.staticUrl = DevCategory.apiUrl + "cdn/static/"
 
-        if(AuthConfig.offlineToken != null) {
+        if(DevCategory.offlineToken != null) {
             startAccessTokenRefresh()
         } else {
             loadDeviceAuthorizationCodes()
@@ -96,7 +96,7 @@ object AuthenticationHandler : AuthenticationProvider {
 
         loadingDeviceAuthorizationCode = true
 
-        val url = AuthConfig.authUrl + "protocol/openid-connect/auth/device"
+        val url = DevCategory.authUrl + "protocol/openid-connect/auth/device"
 
         val request = HttpRequest.newBuilder()
             .uri(URI.create(url))
@@ -122,7 +122,7 @@ object AuthenticationHandler : AuthenticationProvider {
                 is LoginResult.Success -> {
                     val offlineToken = result.data.refreshToken
 
-                    AuthConfig.offlineToken = offlineToken
+                    DevCategory.offlineToken = offlineToken
                     DhCarryHelper.config.save()
 
                     val claims = JwtDecoder.parseJwtClaims(result.data.accessToken)
@@ -161,13 +161,13 @@ object AuthenticationHandler : AuthenticationProvider {
 
     fun startAccessTokenRefresh() {
         accessTokenLoadTask = scheduler.launch {
-            val tokenUrl = AuthConfig.authUrl + "protocol/openid-connect/token"
+            val tokenUrl = DevCategory.authUrl + "protocol/openid-connect/token"
 
             while (true) {
                 try {
                     val body = listOf(
                         "grant_type" to "refresh_token",
-                        "refresh_token" to AuthConfig.offlineToken,
+                        "refresh_token" to DevCategory.offlineToken,
                         "client_id" to "dungeon-hub-carry-helper"
                     ).joinToString("&") { (k, v) ->
                         "${k}=${URLEncoder.encode(v, StandardCharsets.UTF_8)}"
@@ -212,7 +212,7 @@ object AuthenticationHandler : AuthenticationProvider {
     }
 
     suspend fun checkUserLogin(deviceAuthorizationCode: DeviceCodeResponse): LoginResult {
-        val url = AuthConfig.authUrl + "protocol/openid-connect/token"
+        val url = DevCategory.authUrl + "protocol/openid-connect/token"
 
         val body = listOf(
             "grant_type" to "urn:ietf:params:oauth:grant-type:device_code",

@@ -75,14 +75,10 @@ object DhCarryHelper : ClientModInitializer {
             dispatcher.register(
                 ClientCommands.literal("tickets")
                     .then(
-                        ClientCommands.literal("toggle")
-                            .executes(TicketCommand::executeToggle)
-                    )
-                    .then(
                         ClientCommands.literal("refresh")
                             .executes(TicketCommand::executeRefresh)
                     )
-                    .executes(TicketCommand::executeToggle)
+                    .executes(TicketCommand::executeRefresh)
             )
         }
 

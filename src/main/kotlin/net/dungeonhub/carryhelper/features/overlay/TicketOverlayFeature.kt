@@ -1,6 +1,7 @@
 package net.dungeonhub.carryhelper.features.overlay
 
 import net.dungeonhub.carryhelper.auth.AuthenticationHandler
+import net.dungeonhub.carryhelper.config.categories.TicketCategory
 import net.dungeonhub.carryhelper.service.MojangService
 import net.dungeonhub.carryhelper.service.TicketService
 import net.dungeonhub.model.ticket.TicketModel
@@ -8,8 +9,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 
 object TicketOverlayFeature {
-    var isEnabled = true
-
     private const val OVERLAY_X = 10
     private const val OVERLAY_Y = 10
     private const val LINE_HEIGHT = 10
@@ -17,7 +16,8 @@ object TicketOverlayFeature {
     private const val BACKGROUND_COLOR = 0x80000000.toInt()
 
     fun render(guiGraphics: GuiGraphicsExtractor) {
-        if (!isEnabled) return
+        if (Minecraft.getInstance().options.hideGui) return
+        if (!TicketCategory.showClaimedTicketOverlay) return
         if (!AuthenticationHandler.isValid()) return
 
         val tickets = TicketService.getClaimedTickets()?.filter { it.ticketPanel.relatedCarryTier != null }
@@ -83,10 +83,6 @@ object TicketOverlayFeature {
         ?: "?"
 
         return "$channelName: $playerName wants $amount $carryTierName - $carryDifficulty"
-    }
-
-    fun toggle() {
-        isEnabled = !isEnabled
     }
 
     fun refresh() {

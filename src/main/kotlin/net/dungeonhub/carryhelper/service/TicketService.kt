@@ -6,6 +6,7 @@ import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.dungeonhub.carryhelper.auth.AuthenticationHandler
+import net.dungeonhub.carryhelper.config.categories.TicketCategory
 import net.dungeonhub.connection.CarryDifficultyConnection
 import net.dungeonhub.connection.DiscordUserConnection
 import net.dungeonhub.model.carry_difficulty.CarryDifficultyModel
@@ -29,8 +30,6 @@ object TicketService {
     private var isFetching = false
     private var isRunning = false
 
-    private const val FETCH_INTERVAL = 15
-
     private val supervisor = SupervisorJob()
     private val dispatcher = Executors.newFixedThreadPool(2).asCoroutineDispatcher()
 
@@ -46,7 +45,9 @@ object TicketService {
                     fetchTickets()
                 }
 
-                delay(FETCH_INTERVAL.seconds)
+                delay(
+                    TicketCategory.ticketRefreshCooldown.coerceIn(TicketCategory.ticketRefreshCooldownRange).seconds
+                )
             }
         }
     }

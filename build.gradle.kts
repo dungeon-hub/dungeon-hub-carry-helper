@@ -36,29 +36,26 @@ fabricApi {
 }
 
 repositories {
-    mavenLocal()
-
-    maven ("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
+    maven ("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") {
+        content {
+            includeGroup("me.djtheredstoner")
+        }
+    }
 
     maven("https://maven.teamresourceful.com/repository/maven-public/") {
         name = "Team Resourceful Maven"
+        content {
+            includeGroup("com.teamresourceful.resourcefulconfig")
+            includeGroup("com.teamresourceful.resourcefulconfigkt")
+        }
     }
 
     maven("https://releases-repo.kordex.dev") {
         name = "KordEx Releases Repository"
         content {
-            includeGroup("com.kotlindiscord")
-            includeGroup("dev.kordex")
+            includeGroup("dev.kordex.i18n")
         }
     }
-
-    /*maven("https://snapshots-repo.kordex.dev") {
-        name = "KordEx Snapshot Repository"
-        content {
-            includeGroup("com.kotlindiscord")
-            includeGroup("dev.kordex")
-        }
-    }*/
 
     maven("https://repo.kordex.dev/mirror") {
         name = "Kord Mirror Repository"

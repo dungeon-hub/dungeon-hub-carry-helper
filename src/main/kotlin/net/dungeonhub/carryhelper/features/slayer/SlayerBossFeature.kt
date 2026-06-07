@@ -32,9 +32,6 @@ object SlayerBossFeature {
     private var currentWorld: ClientLevel? = null
     private var slayerBosses = mutableSetOf<SlayerBoss>()
 
-    private var lastClickedEntity: Entity? = null
-    private var lastHitCarrierBoss = false
-
     private val supervisor = SupervisorJob()
     private val dispatcher = Executors.newFixedThreadPool(2).asCoroutineDispatcher()
 
@@ -46,20 +43,14 @@ object SlayerBossFeature {
         }
     }
 
+    // TODO is this still needed?
     fun handleHitEntity(entity: Entity) {
-        lastClickedEntity = entity
-        lastHitCarrierBoss = false
-
         val armorStands = getEntityArmorStands(entity)
         val bossType = findSlayerType(armorStands) ?: return
 
-        val slayerBosses = SlayerBoss(entity, bossType, armorStands)
+        val slayerBoss = SlayerBoss(entity, bossType, armorStands)
 
-//        val bossType = foundArmorStands.filter { it.name.string.contains("༕ ☠ Revenant Horror I 500❤") }
-        val slayerSpawner = slayerBosses.spawner ?: return
-
-        lastHitCarrierBoss = true
-//        lastHitCarrierBoss = CarryTracker.isCustomer(mob.ownerNameOrEmpty)
+        val slayerSpawner = slayerBoss.spawner ?: return
     }
 
     fun onSlayerDeath(slayerBoss: SlayerBoss) {
@@ -101,7 +92,6 @@ object SlayerBossFeature {
 
     fun newSlayerBosses(newSlayerBosses: Set<SlayerBoss>) {
         for(boss in slayerBosses) {
-//            if(!newSlayerBosses.any { it == boss }) {
             if(boss !in newSlayerBosses) {
                 if(boss.entity.distanceTo(Minecraft.getInstance().player!!) > 50) continue
 

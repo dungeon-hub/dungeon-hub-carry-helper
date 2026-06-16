@@ -6,10 +6,11 @@ import net.minecraft.world.level.GameType
 
 object ScoreboardUtil {
     fun getScoreboard(): List<Component>? {
-        val player = Minecraft.getInstance().player ?: return null
+        val minecraft = Minecraft.getInstance()
+        val player = minecraft.player ?: return null
         val onlinePlayers = player.connection.onlinePlayers.filter {
             it.gameMode != GameType.SPECTATOR
         }.sortedBy { it.team?.name ?: "" }
-        return onlinePlayers.map { Minecraft.getInstance().gui.tabList.getNameForDisplay(it) }
+        return onlinePlayers.map { minecraft.gui.tabList.getNameForDisplay(it) }
     }
 }

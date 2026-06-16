@@ -159,9 +159,7 @@ object SlayerBossFeature {
                 return@launch
             }
 
-            val ticketIds = TicketService.getClaimedTickets()?.let {
-                claimedTickets.filter { carriedUser == it.user.minecraftId }.map { it.id }
-            } ?: return@launch
+            val ticketIds = claimedTickets.filter { carriedUser == it.user.minecraftId }.map { it.id }
 
             if(ticketIds.isEmpty()) {
                 logger.sendDevDebug("[CH] Couldn't find a related ticket for killed slayer from $spawner!")
@@ -195,16 +193,16 @@ object SlayerBossFeature {
                     createdQueues.map { "#${it.id}: ${it.amount} ${it.carryDifficulty.displayName} (${it.carryDifficulty.identifier} #${it.carryDifficulty.id}) related to ${it.relationId}" }
                 }")
             } else {
+                val message = Component.literal("[CH] Logged ${createdQueues.size} ${if(createdQueues.size == 1) "carry" else "carries"} for ${
+                    createdQueues.map {
+                        it.player.minecraftId?.let {
+                            MojangService.awaitPlayerName(it)
+                        } ?: "Unknown"
+                    }.joinToString(", ") 
+                } automatically!").setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN))
+
                 Minecraft.getInstance().execute {
-                    Minecraft.getInstance().gui.chat.addClientSystemMessage(
-                        Component.literal("[CH] Logged ${createdQueues.size} ${if(createdQueues.size == 1) "carry" else "carries"} for ${
-                            createdQueues.joinToString(", ") {
-                                it.player.minecraftId?.let {
-                                    MojangService.getPlayerName(it)
-                                } ?: "Unknown"
-                            }
-                        } automatically!").setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN))
-                    )
+                    Minecraft.getInstance().gui.chat.addClientSystemMessage(message)
                 }
             }
         }

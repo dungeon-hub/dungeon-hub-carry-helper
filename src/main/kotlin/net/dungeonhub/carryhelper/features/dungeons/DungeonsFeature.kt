@@ -3,6 +3,8 @@ package net.dungeonhub.carryhelper.features.dungeons
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import net.dungeonhub.carryhelper.auth.AuthenticationHandler
 import net.dungeonhub.carryhelper.service.MojangService
@@ -98,9 +100,7 @@ object DungeonsFeature {
                 return@launch
             }
 
-            val ticketIds = TicketService.getClaimedTickets()?.let {
-                claimedTickets.filter { users.contains(it.user.minecraftId) }.map { it.id }
-            } ?: return@launch
+            val ticketIds = claimedTickets.filter { users.contains(it.user.minecraftId) }.map { it.id }
 
             if(ticketIds.isEmpty()) {
                 logger.sendDevDebug("[CH] Couldn't find any related tickets for the following users in the dungeon: $users")
@@ -134,28 +134,29 @@ object DungeonsFeature {
                     createdQueues.map { "#${it.id}: ${it.amount} ${it.carryDifficulty.displayName} (${it.carryDifficulty.identifier} #${it.carryDifficulty.id}) related to ${it.relationId}" }
                 }")
             } else {
+                val message = Component.literal("[CH] Logged ${createdQueues.size} ${if(createdQueues.size == 1) "carry" else "carries"} for ${
+                    createdQueues.map {
+                        it.player.minecraftId?.let {
+                            MojangService.awaitPlayerName(it)
+                        } ?: "Unknown"
+                    }.joinToString(", ")
+                } automatically!").setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN))
+
                 Minecraft.getInstance().execute {
-                    Minecraft.getInstance().gui.chat.addClientSystemMessage(
-                        Component.literal("[CH] Logged ${createdQueues.size} ${if(createdQueues.size == 1) "carry" else "carries"} for ${
-                            createdQueues.joinToString(", ") {
-                                it.player.minecraftId?.let {
-                                    MojangService.getPlayerName(it)
-                                } ?: "Unknown"
-                            }
-                        } automatically!").setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN))
-                    )
+                    Minecraft.getInstance().gui.chat.addClientSystemMessage(message)
                 }
             }
         }
     }
 
-    // TODO implement
     suspend fun findDungeonTeam(): List<UUID> {
         return ScoreboardUtil.getScoreboard()?.mapNotNull {
             val result = dungeonPlayerRegex.find(it.string) ?: return@mapNotNull null
 
             result.groups["playerName"]?.value
-        }?.mapNotNull { MojangService.awaitPlayerUuid(it) } ?: emptyList()
+        }?.map { name ->
+            scheduler.async { MojangService.awaitPlayerUuid(name) }
+        }?.awaitAll()?.filterNotNull() ?: emptyList()
     }
 
     fun handleDefeatedMessage(text: String) {
@@ -193,9 +194,8 @@ object DungeonsFeature {
         logger.sendDebug("[CH] Completed the floor with $score")
     }
 
-    // TODO handle master mode
     fun handleFloorMessage(text: String) {
-        val result = floorRegex.matchEntire(text) ?: return // TODO check if "matchEntire" does the job here
+        val result = floorRegex.matchEntire(text) ?: return
 
         val type = result.groupValues.getOrNull(1) ?: return
         val floor = result.groupValues.getOrNull(2) ?: return

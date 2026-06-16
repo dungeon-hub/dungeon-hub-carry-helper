@@ -68,6 +68,14 @@ object MojangService {
         return null
     }
 
+    suspend fun awaitPlayerUuid(name: String, maxRetries: Int = 10, delayDuration: Duration = 100.milliseconds): UUID? {
+        repeat(maxRetries) {
+            getPlayerUuid(name)?.let { return it }
+            delay(delayDuration)
+        }
+        return null
+    }
+
     private fun fetchByUuid(uuid: UUID) {
         scheduler.launch {
             try {

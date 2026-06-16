@@ -2,17 +2,14 @@ package net.dungeonhub.carryhelper
 
 import com.teamresourceful.resourcefulconfig.api.client.ResourcefulConfigScreen
 import com.teamresourceful.resourcefulconfig.api.loader.Configurator
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import net.dungeonhub.carryhelper.auth.AuthenticationHandler
 import net.dungeonhub.carryhelper.commands.TicketCommand
 import net.dungeonhub.carryhelper.config.Config
+import net.dungeonhub.carryhelper.features.dungeons.DungeonsFeature
+import net.dungeonhub.carryhelper.features.slayer.SlayerBossFeature
 import net.dungeonhub.carryhelper.logging.LogCommand
 import net.dungeonhub.carryhelper.service.TicketService
-import net.dungeonhub.carryhelper.features.slayer.SlayerBossFeature
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 import net.fabricmc.fabric.api.client.command.v2.ClientCommands
@@ -100,5 +97,7 @@ object DhCarryHelper : ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register {
             SlayerBossFeature.onTick()
         }
+
+        DungeonsFeature.initialize()
     }
 }

@@ -155,7 +155,7 @@ object SlayerBossFeature {
             val carriedUser = MojangService.getPlayerUuid(spawner)
 
             if(carriedUser == null) {
-                logger.sendDevError("Couldn't load user for slayer spawner: $spawner")
+                logger.sendDevError("[CH] Couldn't load user for slayer spawner: $spawner")
                 return@launch
             }
 

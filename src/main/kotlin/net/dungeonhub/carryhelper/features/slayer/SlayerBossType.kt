@@ -25,9 +25,8 @@ enum class SlayerBossType(val slayerName: String, val ingameCarryType: IngameCar
     Voidgloom3("Voidgloom Seraph III", IngameCarryType.Voidgloom3),
     Voidgloom4("Voidgloom Seraph IV", IngameCarryType.Voidgloom4),
 
-    // TODO the blaze slayer integration has to be tested a bit more --> if the boss despawns for the mini bosses to take over, this could cause issues
-    /*Inferno1("Inferno Demonlord I", IngameCarryType.Inferno1),
+    Inferno1("Inferno Demonlord I", IngameCarryType.Inferno1),
     Inferno2("Inferno Demonlord II", IngameCarryType.Inferno2),
     Inferno3("Inferno Demonlord III", IngameCarryType.Inferno3),
-    Inferno4("Inferno Demonlord IV", IngameCarryType.Inferno4),*/
+    Inferno4("Inferno Demonlord IV", IngameCarryType.Inferno4),
 }

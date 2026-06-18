@@ -20,6 +20,7 @@ import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.phys.EntityHitResult
 import net.minecraft.world.phys.HitResult
@@ -53,10 +54,21 @@ object SlayerBossFeature {
         val slayerSpawner = slayerBoss.spawner ?: return
     }
 
+    fun onEntityDeath(entity: LivingEntity) {
+        val relatedBoss = slayerBosses.firstOrNull { it.entity == entity } ?: return
+
+        slayerBosses.remove(relatedBoss)
+        onSlayerDeath(relatedBoss)
+    }
+
     fun onSlayerDeath(slayerBoss: SlayerBoss) {
         if(slayerBoss.spawner == null) return
 
         logCompletedSlayerCarry(slayerBoss)
+    }
+
+    fun onSlayerSpawn(slayerBoss: SlayerBoss) {
+        
     }
 
     fun onTick() {
@@ -74,6 +86,8 @@ object SlayerBossFeature {
         val currentSlayerBosses = mutableSetOf<SlayerBoss>()
 
         for(entity in allVisibleEntities) {
+            if(entity is LivingEntity && entity.isDeadOrDying) continue
+
             val armorStands = getEntityArmorStands(entity)
 
             val slayerBossType = findSlayerType(armorStands) ?: continue
@@ -91,16 +105,12 @@ object SlayerBossFeature {
     }
 
     fun newSlayerBosses(newSlayerBosses: Set<SlayerBoss>) {
-        for(boss in slayerBosses) {
-            if(boss !in newSlayerBosses) {
-                if(boss.entity.distanceTo(Minecraft.getInstance().player!!) > 50) continue
-
-                onSlayerDeath(boss)
+        for(boss in newSlayerBosses) {
+            if(boss !in slayerBosses) {
+                slayerBosses.add(boss)
+                onSlayerSpawn(boss)
             }
         }
-
-        slayerBosses.clear()
-        slayerBosses.addAll(newSlayerBosses)
     }
 
     fun getEntityArmorStands(entity: Entity): Set<ArmorStand> {

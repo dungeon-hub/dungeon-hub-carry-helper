@@ -162,7 +162,7 @@ object SlayerBossFeature {
         val claimedTickets = TicketService.getClaimedTickets() ?: return
 
         scheduler.launch {
-            val carriedUser = MojangService.getPlayerUuid(spawner)
+            val carriedUser = MojangService.awaitPlayerUuid(spawner)
 
             if(carriedUser == null) {
                 logger.sendDevError("[CH] Couldn't load user for slayer spawner: $spawner")

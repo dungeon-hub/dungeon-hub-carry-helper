@@ -46,4 +46,11 @@ object MessageUtil {
 
         debug(message)
     }
+
+    fun Minecraft.sendMessage(component: Component, additionalLogic: () -> Unit = {}) {
+        execute {
+            gui.chat.addClientSystemMessage(component)
+            additionalLogic()
+        }
+    }
 }

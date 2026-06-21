@@ -8,6 +8,8 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
@@ -66,9 +68,21 @@ object AuthenticationHandler : AuthenticationProvider {
 
     private val scheduler = CoroutineScope(supervisor + dispatcher)
 
+    var username: String? = null
+        private set
+
     fun shutdown() {
         scheduler.cancel()
         dispatcher.close()
+    }
+
+    fun logout() {
+        offlineTokenLoadTask = null
+        accessTokenLoadTask = null
+
+        accessToken = null
+        accessTokenFailure = false
+        DevCategory.offlineToken = null
     }
 
     fun isValid(): Boolean {
@@ -125,9 +139,8 @@ object AuthenticationHandler : AuthenticationProvider {
                     DevCategory.offlineToken = offlineToken
                     DhCarryHelper.config.save()
 
-                    val claims = JwtDecoder.parseJwtClaims(result.data.accessToken)
-
-                    val username: String? = claims["given_name"] ?: claims["preferred_username"]
+                    val username = getUsername(result.data.accessToken)
+                    AuthenticationHandler.username = username
 
                     val message = "[CH] Successfully logged in${if (username != null) " as $username" else ""}!"
 
@@ -190,6 +203,9 @@ object AuthenticationHandler : AuthenticationProvider {
                         accessToken = result.accessToken
                         accessTokenFailure = false
 
+                        val username = getUsername(result.accessToken)
+                        AuthenticationHandler.username = username
+
                         val delayTime = (result.expiresIn - 5).seconds
                         delay(delayTime)
                     } else {
@@ -209,6 +225,12 @@ object AuthenticationHandler : AuthenticationProvider {
                 }
             }
         }
+    }
+
+    private fun getUsername(accessToken: String): String? {
+        val claims = JwtDecoder.parseJwtClaims(accessToken)
+
+        return claims["given_name"] ?: claims["preferred_username"]
     }
 
     suspend fun checkUserLogin(deviceAuthorizationCode: DeviceCodeResponse): LoginResult {
@@ -311,6 +333,42 @@ object AuthenticationHandler : AuthenticationProvider {
         }
 
         return false
+    }
+
+    fun promptLogin(): Flow<Component>? {
+        if(isValid()) return null
+
+        val deviceAuthorizationCode = deviceAuthorizationCode
+
+        return flow {
+            if(deviceAuthorizationCode == null) {
+                emit(Component.literal("[CH] Please login! Loading authentication URL...").withStyle(ChatFormatting.RED))
+
+                val deviceAuthorizationCode = loadDeviceAuthorizationCodes()
+
+                if(deviceAuthorizationCode == null) {
+                    emit(Component.literal("[CH] Failed to load the authentication URL!").withStyle(ChatFormatting.RED))
+                } else {
+                    emit(Component.literal("Please login: ").append(
+                        Component.literal(deviceAuthorizationCode.completeVerificationUrl).setStyle(
+                            Style.EMPTY
+                                .withClickEvent(ClickEvent.OpenUrl(URI.create(deviceAuthorizationCode.completeVerificationUrl)))
+                                .withColor(ChatFormatting.AQUA)
+                                .withUnderlined(true)
+                        )
+                    ))
+                }
+            } else {
+                emit(Component.literal("[CH] Please login: ").withStyle(ChatFormatting.RED).append(
+                    Component.literal(deviceAuthorizationCode.completeVerificationUrl).setStyle(
+                        Style.EMPTY
+                            .withClickEvent(ClickEvent.OpenUrl(URI.create(deviceAuthorizationCode.completeVerificationUrl)))
+                            .withColor(ChatFormatting.AQUA)
+                            .withUnderlined(true)
+                    )
+                ))
+            }
+        }
     }
 
     @Serializable

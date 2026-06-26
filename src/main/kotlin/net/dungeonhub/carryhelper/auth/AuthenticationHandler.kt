@@ -83,6 +83,8 @@ object AuthenticationHandler : AuthenticationProvider {
         accessToken = null
         accessTokenFailure = false
         DevCategory.offlineToken = null
+
+        DhCarryHelper.config.save()
     }
 
     fun isValid(): Boolean {

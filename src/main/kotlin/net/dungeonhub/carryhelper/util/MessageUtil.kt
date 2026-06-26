@@ -47,6 +47,11 @@ object MessageUtil {
         debug(message)
     }
 
+    /**
+     * Sends a chat message and optionally runs additional logic on the main thread.
+     * Both the message display and the additionalLogic callback run inside Minecraft.execute {},
+     * ensuring they execute on the main Minecraft thread.
+     */
     fun Minecraft.sendMessage(component: Component, additionalLogic: () -> Unit = {}) {
         execute {
             gui.chat.addClientSystemMessage(component)

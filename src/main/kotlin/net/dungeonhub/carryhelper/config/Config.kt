@@ -87,7 +87,6 @@ object Config : ConfigKt("$MOD_ID/config") {
                             .withColor(ChatFormatting.GREEN)
                     )
                 ) { Minecraft.getInstance().setScreen(null) }
-                return@onClick
             }
         }
 

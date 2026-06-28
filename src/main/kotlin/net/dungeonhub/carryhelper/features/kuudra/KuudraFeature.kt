@@ -1,4 +1,4 @@
-package net.dungeonhub.carryhelper.features.dungeons
+package net.dungeonhub.carryhelper.features.kuudra
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -23,24 +23,13 @@ import net.minecraft.network.chat.Style
 import org.slf4j.LoggerFactory
 import java.util.UUID
 import java.util.concurrent.Executors
-import kotlin.collections.joinToString
 import kotlin.collections.map
 
-object DungeonsFeature {
-    private val logger = LoggerFactory.getLogger(DungeonsFeature::class.java)
+object KuudraFeature {
+    private val logger = LoggerFactory.getLogger(KuudraFeature::class.java)
 
-    private val floorRegex = Regex("(Master Mode The Catacombs|The Catacombs) - (Entrance|Floor [IV]{1,3})")
-    private val scoreRegex = Regex("Team Score: (\\d{1,3}) \\((S\\+|S|A|B|C|D)\\)")
-    private val defeatedRegex = Regex("☠ Defeated (The Watcher|Bonzo|Scarf|The Professor|Thorn|Livid|Sadan|Maxor, Storm, Goldor, and Necron) in ")
-    // Credit: SkyHanni
-    private val dungeonPlayerRegex = Regex("^(?<sbLevel>\\[\\d+]) (?<rank>\\[[^]]+])? ?(?<playerName>\\S+)\\s?(?<symbols>[^(]*) \\((?:(?<className>\\S+) (?<classLevel>[CLXVI0]+)|(?<playerDead>DEAD))\\)\$")
-
-    private var floorLastMessage = false
-    private var scoreLastMessage = false
-
-    private var lastType: String? = null
-    private var lastFloor: String? = null
-    private var lastScore: String? = null
+    private val endRegex = Regex("^\\s+KUUDRA DOWN!")
+    private val tierRegex = Regex(" ⏣ Kuudra's Hollow \\(T(?<tier>\\d+)\\)")
 
     private val supervisor = SupervisorJob()
     private val dispatcher = Executors.newFixedThreadPool(2).asCoroutineDispatcher()
@@ -58,52 +47,47 @@ object DungeonsFeature {
     }
 
     fun handleMessage(text: String) {
-        if(scoreLastMessage) {
-            scoreLastMessage = false
+        endRegex.find(text) ?: return
 
-            handleDefeatedMessage(text)
+        val tierText = ScoreboardUtil.getAreaLine()?.let {
+            val result = tierRegex.find(it) ?: return@let null
+
+            result.groups["tier"]?.value
         }
 
-        if(floorLastMessage) {
-            floorLastMessage = false
-
-            handleScoreMessage(text)
+        val tier = tierText?.let { tier ->
+            KuudraTier.fromTier(tier) ?: return@let null
         }
 
-        handleFloorMessage(text)
+        if (tier == null) {
+            logger.sendDevError("[CH] Tried to log a carry, but couldn't read the tier ($tierText).")
+            return
+        }
+
+        logger.sendDebug("[CH] Completed Kuudra $tier!")
+
+        logCompletedKuudraCarry(tier)
     }
 
-    fun logCompletedCatacombsCarry() {
-        if(lastType == null || lastFloor == null || lastScore == null) {
-            logger.sendDevError("[CH] Tried to log a carry, but couldn't read the type ($lastType), floor ($lastFloor) or score ($lastScore).")
-            return
-        }
-
-        val dungeonFloor = DungeonFloor.getFromName(lastType ?: return, lastFloor ?: return)
-
-        if(dungeonFloor == null) {
-            logger.sendDevError("[CH] Tried to log a carry, but couldn't read the type ($lastType) or floor ($lastFloor).")
-            return
-        }
-
-        val carryType = dungeonFloor.getCarryType(lastScore ?: return)
+    fun logCompletedKuudraCarry(tier: KuudraTier) {
+        val carryType = tier.carryType
 
         logger.sendDebug("[CH] Trying to log: $carryType")
 
         val claimedTickets = TicketService.getClaimedTickets() ?: return
 
         scheduler.launch {
-            val users = findDungeonTeam()
+            val users = findKuudraTeam()
 
             if(users.isEmpty()) {
-                logger.sendDevError("[CH] Couldn't find any users in the dungeon.")
+                logger.sendDevError("[CH] Couldn't find any users in the Kuudra run.")
                 return@launch
             }
 
             val ticketIds = claimedTickets.filter { users.contains(it.user.minecraftId) }.map { it.id }
 
             if(ticketIds.isEmpty()) {
-                logger.sendDevDebug("[CH] Couldn't find any related tickets for the following users in the dungeon: $users")
+                logger.sendDevDebug("[CH] Couldn't find any related tickets for the following users in the Kuudra run: $users")
                 return@launch
             }
 
@@ -149,61 +133,11 @@ object DungeonsFeature {
         }
     }
 
-    suspend fun findDungeonTeam(): List<UUID> {
-        return ScoreboardUtil.getTabPlayersDisplayNames()?.mapNotNull {
-            val result = dungeonPlayerRegex.find(it.string) ?: return@mapNotNull null
-
-            result.groups["playerName"]?.value
+    suspend fun findKuudraTeam(): List<UUID> {
+        return ScoreboardUtil.getOnlinePlayers()?.mapNotNull {
+            it.profile.name
         }?.map { name ->
             scheduler.async { MojangService.awaitPlayerUuid(name) }
         }?.awaitAll()?.filterNotNull() ?: emptyList()
-    }
-
-    fun handleDefeatedMessage(text: String) {
-        val result = defeatedRegex.find(text)
-        if(result == null) {
-            logger.sendDevDebug("[CH] Tried to log a carry, but it seems like the dungeon boss wasn't beaten: $text")
-            lastScore = null
-            lastType = null
-            lastFloor = null
-
-            return
-        }
-
-        logger.sendDebug("[CH] The dungeon boss was defeated, trying to log the carry")
-
-        logCompletedCatacombsCarry()
-    }
-
-    fun handleScoreMessage(text: String) {
-        val result = scoreRegex.find(text)
-        if(result == null) {
-            logger.sendDevError("[CH] Expected a score message, but the message ($lastType $lastFloor) didn't fit: $text")
-            logger.sendDevError("[CH] If you didn't expect this, please report this!")
-            lastType = null
-            lastFloor = null
-
-            return
-        }
-
-        val score = result.groupValues.getOrNull(2)
-
-        scoreLastMessage = true
-        lastScore = score
-
-        logger.sendDebug("[CH] Completed the floor with $score")
-    }
-
-    fun handleFloorMessage(text: String) {
-        val result = floorRegex.matchEntire(text) ?: return
-
-        val type = result.groupValues.getOrNull(1) ?: return
-        val floor = result.groupValues.getOrNull(2) ?: return
-
-        floorLastMessage = true
-        lastType = type
-        lastFloor = floor
-
-        logger.sendDebug("[CH] Completed $type floor $floor!")
     }
 }

@@ -28,7 +28,7 @@ import kotlin.collections.map
 object KuudraFeature {
     private val logger = LoggerFactory.getLogger(KuudraFeature::class.java)
 
-    private val endRegex = Regex("^\\s+KUUDRA DOWN!")
+    private val endRegex = Regex("^KUUDRA DOWN!")
     private val tierRegex = Regex(" ⏣ Kuudra's Hollow \\(T(?<tier>\\d+)\\)")
 
     private val supervisor = SupervisorJob()

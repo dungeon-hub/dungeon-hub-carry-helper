@@ -103,7 +103,7 @@ object DungeonsFeature {
             val ticketIds = claimedTickets.filter { users.contains(it.user.minecraftId) }.map { it.id }
 
             if(ticketIds.isEmpty()) {
-                logger.sendDevDebug("[CH] Couldn't find any related tickets for the following users in the dungeon: $users")
+                logger.sendDevDebug("[CH] Couldn't find any related tickets for the following users in the dungeon: ${users.joinToString { MojangService.getPlayerName(it) ?: it.toString() }}")
                 return@launch
             }
 

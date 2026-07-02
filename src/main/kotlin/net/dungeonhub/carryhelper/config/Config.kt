@@ -99,7 +99,7 @@ object Config : ConfigKt("$MOD_ID/config") {
             description = "This is open source!"
             text = "Open"
             onClick {
-                Util.getPlatform().openUri("https://github.com/dungeon-hub/")
+                Util.getPlatform().openUri("https://github.com/dungeon-hub/dungeon-hub-carry-helper/")
             }
         }
 

@@ -50,7 +50,7 @@ object KuudraFeature {
         endRegex.find(text) ?: return
 
         val tierText = ScoreboardUtil.getAreaLine()?.let {
-            val result = tierRegex.find(it) ?: return@let null
+            val result = tierRegex.find(ChatFormatting.stripFormatting(it)!!) ?: return@let null
 
             result.groups["tier"]?.value
         }

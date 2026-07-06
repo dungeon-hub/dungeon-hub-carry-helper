@@ -31,8 +31,8 @@ object ScoreboardUtil {
     fun getAreaLine(): String? {
         val scoreboard = Minecraft.getInstance().level?.scoreboard ?: return null
 
-        val scoreboardLines = getScoreboardLines()?.map {
-            val team = scoreboard.getPlayersTeam(it.owner) ?: return null
+        val scoreboardLines = getScoreboardLines()?.mapNotNull {
+            val team = scoreboard.getPlayersTeam(it.owner) ?: return@mapNotNull null
 
             team.playerPrefix.string + it.owner + team.playerSuffix.string
         }

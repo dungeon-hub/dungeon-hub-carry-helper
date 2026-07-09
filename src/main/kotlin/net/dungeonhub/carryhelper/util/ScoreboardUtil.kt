@@ -39,6 +39,6 @@ object ScoreboardUtil {
 
         // The format looks like:
         //  §7⏣ §dThe End
-        return scoreboardLines?.firstOrNull { it.contains("⏣") }
+        return scoreboardLines?.firstOrNull { it.contains("\uE067") }
     }
 }

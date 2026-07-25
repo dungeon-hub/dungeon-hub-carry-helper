@@ -1,5 +1,7 @@
 package net.dungeonhub.carryhelper.util
 
+import com.google.common.collect.ComparisonChain
+import com.google.common.collect.Ordering
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.PlayerInfo
 import net.minecraft.network.chat.Component
@@ -9,6 +11,15 @@ import net.minecraft.world.scores.PlayerScoreEntry
 import kotlin.text.contains
 
 object ScoreboardUtil {
+    // Credit: SkyHanni
+    private val playerOrdering = Ordering.from(TabPlayerComparator())
+    internal class TabPlayerComparator : Comparator<PlayerInfo> {
+        override fun compare(o1: PlayerInfo, o2: PlayerInfo): Int = ComparisonChain.start()
+            .compareTrueFirst(o1.gameMode != GameType.SPECTATOR, o2.gameMode != GameType.SPECTATOR)
+            .compare(o1.team?.name.orEmpty(), o2.team?.name.orEmpty())
+            .compare(o1.profile.name, o2.profile.name).result()
+    }
+
     fun getOnlinePlayers(): List<PlayerInfo>? {
         val player = Minecraft.getInstance().player ?: return null
 
@@ -17,7 +28,18 @@ object ScoreboardUtil {
         }.sortedBy { it.team?.name ?: "" }.filter { it.profile.id.version() == 4 }
     }
 
-    fun getTabPlayersDisplayNames(): List<Component>? {
+    fun getTabList(): List<Component>? {
+        val player = Minecraft.getInstance().player ?: return null
+
+        val result = playerOrdering.sortedCopy(player.connection.onlinePlayers).map {
+            Minecraft.getInstance().gui.tabList.getNameForDisplay(it)
+        }
+
+        return if (result.size < 80) result
+        else result.subList(0, 80)
+    }
+
+    fun getOnlinePlayersDisplayNames(): List<Component>? {
         return getOnlinePlayers()?.map { Minecraft.getInstance().gui.tabList.getNameForDisplay(it) }
     }
 

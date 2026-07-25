@@ -31,7 +31,7 @@ object DungeonsFeature {
 
     private val floorRegex = Regex("(Master Mode The Catacombs|The Catacombs) - (Entrance|Floor [IV]{1,3})")
     private val scoreRegex = Regex("Team Score: (\\d{1,3}) \\((S\\+|S|A|B|C|D)\\)")
-    private val defeatedRegex = Regex(". Defeated (The Watcher|Bonzo|Scarf|The Professor|Thorn|Livid|Sadan|Maxor, Storm, Goldor, and Necron) in ")
+    private val defeatedRegex = Regex("☠ Defeated (The Watcher|Bonzo|Scarf|The Professor|Thorn|Livid|Sadan|Maxor, Storm, Goldor, and Necron) in ")
     // Credit: SkyHanni
     private val dungeonPlayerRegex = Regex("^(?<sbLevel>\\[\\d+]) (?<rank>\\[[^]]+])? ?(?<playerName>\\S+)\\s?(?<symbols>[^(]*) \\((?:(?<className>\\S+) (?<classLevel>[CLXVI0]+)|(?<playerDead>DEAD))\\)\$")
 

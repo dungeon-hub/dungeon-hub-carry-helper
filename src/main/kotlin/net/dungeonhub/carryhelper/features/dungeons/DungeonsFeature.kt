@@ -150,7 +150,7 @@ object DungeonsFeature {
     }
 
     suspend fun findDungeonTeam(): List<UUID> {
-        return ScoreboardUtil.getTabPlayersDisplayNames()?.mapNotNull {
+        return ScoreboardUtil.getTabList()?.mapNotNull {
             val result = dungeonPlayerRegex.find(it.string) ?: return@mapNotNull null
 
             result.groups["playerName"]?.value

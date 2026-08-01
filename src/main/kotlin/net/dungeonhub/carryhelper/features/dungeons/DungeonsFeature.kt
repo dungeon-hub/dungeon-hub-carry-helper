@@ -15,7 +15,6 @@ import net.dungeonhub.carryhelper.util.MessageUtil.sendDevError
 import net.dungeonhub.carryhelper.util.ScoreboardUtil
 import net.dungeonhub.connection.QueueConnection
 import net.dungeonhub.model.carry_queue.IngameQueueCreationModel
-import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
@@ -47,17 +46,9 @@ object DungeonsFeature {
 
     private val scheduler = CoroutineScope(supervisor + dispatcher)
 
-    fun initialize() {
-        ClientReceiveMessageEvents.GAME.register { message, _ ->
-            val text = message.string.trim()
-
-            if(text.isEmpty()) return@register
-
-            handleMessage(text)
-        }
-    }
-
     fun handleMessage(text: String) {
+        if(text.isEmpty()) return
+
         if(scoreLastMessage) {
             scoreLastMessage = false
 

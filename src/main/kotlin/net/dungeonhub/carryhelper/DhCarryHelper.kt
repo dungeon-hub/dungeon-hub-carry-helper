@@ -6,7 +6,6 @@ import kotlinx.coroutines.*
 import net.dungeonhub.carryhelper.auth.AuthenticationHandler
 import net.dungeonhub.carryhelper.commands.TicketCommand
 import net.dungeonhub.carryhelper.config.Config
-import net.dungeonhub.carryhelper.features.dungeons.DungeonsFeature
 import net.dungeonhub.carryhelper.features.kuudra.KuudraFeature
 import net.dungeonhub.carryhelper.features.slayer.SlayerBossFeature
 import net.dungeonhub.carryhelper.logging.LogCommand
@@ -98,8 +97,6 @@ object DhCarryHelper : ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register {
             SlayerBossFeature.onTick()
         }
-
-        DungeonsFeature.initialize()
 
         KuudraFeature.initialize()
     }

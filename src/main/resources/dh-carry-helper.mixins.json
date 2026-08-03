@@ -5,6 +5,8 @@
   "compatibilityLevel": "JAVA_25",
   "client": [
     "ClickMixin",
+    "ClientPacketListenerMixin",
+    "ConnectionMixin",
     "HudRenderMixin",
     "LivingEntityMixin"
   ],

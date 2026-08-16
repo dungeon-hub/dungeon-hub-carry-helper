@@ -56,7 +56,7 @@ object ScoreboardUtil {
         val scoreboardLines = getScoreboardLines()?.mapNotNull {
             val team = scoreboard.getPlayersTeam(it.owner) ?: return@mapNotNull null
 
-            team.playerPrefix.string + it.owner + team.playerSuffix.string
+            team.playerPrefix.string + team.playerSuffix.string
         }
 
         // The format looks like:

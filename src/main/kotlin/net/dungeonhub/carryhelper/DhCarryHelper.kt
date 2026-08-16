@@ -7,9 +7,13 @@ import net.dungeonhub.carryhelper.auth.AuthenticationHandler
 import net.dungeonhub.carryhelper.commands.TicketCommand
 import net.dungeonhub.carryhelper.config.Config
 import net.dungeonhub.carryhelper.features.kuudra.KuudraFeature
+import net.dungeonhub.carryhelper.features.slayer.EndermanSlayerArea
 import net.dungeonhub.carryhelper.features.slayer.SlayerBossFeature
 import net.dungeonhub.carryhelper.logging.LogCommand
 import net.dungeonhub.carryhelper.service.TicketService
+import net.dungeonhub.carryhelper.util.MessageUtil.sendDebug
+import net.dungeonhub.carryhelper.util.MessageUtil.sendMessage
+import net.dungeonhub.carryhelper.util.ScoreboardUtil
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 import net.fabricmc.fabric.api.client.command.v2.ClientCommands
@@ -18,11 +22,15 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.client.Minecraft
+import net.minecraft.network.chat.Component
+import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
 import kotlin.time.Duration.Companion.milliseconds
 
 object DhCarryHelper : ClientModInitializer {
     const val MOD_ID = "dh-carry-helper"
+
+    private val logger = LoggerFactory.getLogger(DhCarryHelper::class.java)
 
     lateinit var version: String
 
@@ -45,6 +53,18 @@ object DhCarryHelper : ClientModInitializer {
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
             dispatcher.register(
                 ClientCommands.literal("carry-helper")
+                    .then(
+                        ClientCommands.literal("debug")
+                            .then(
+                                ClientCommands.literal("currentarea").executes {
+                                    Minecraft.getInstance().sendMessage(Component.literal("[CH] Current area: ${EndermanSlayerArea.getArea()?.name ?: "None found"}"))
+                                    ScoreboardUtil.getAreaLine()?.let { logger.sendDebug(it) }
+                                    return@executes 1
+                                }
+                            ).executes {
+                                return@executes 0
+                            }
+                    )
                     .executes {
                         Minecraft.getInstance().schedule {
                             Minecraft.getInstance().setScreen(ResourcefulConfigScreen.getFactory(MOD_ID).apply(null))

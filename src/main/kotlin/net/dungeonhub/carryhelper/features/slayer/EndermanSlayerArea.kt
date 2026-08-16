@@ -1,6 +1,7 @@
 package net.dungeonhub.carryhelper.features.slayer
 
 import net.dungeonhub.carryhelper.util.ScoreboardUtil
+import net.minecraft.ChatFormatting
 
 enum class EndermanSlayerArea(val areaName: String) {
     Sepulture("Void Sepulture"),
@@ -8,7 +9,7 @@ enum class EndermanSlayerArea(val areaName: String) {
 
     companion object {
         fun getArea(): EndermanSlayerArea? {
-            val areaLine = ScoreboardUtil.getAreaLine() ?: return null
+            val areaLine = ChatFormatting.stripFormatting(ScoreboardUtil.getAreaLine()) ?: return null
 
             for(possibleArea in EndermanSlayerArea.entries) {
                 if(areaLine.endsWith(possibleArea.areaName)) {

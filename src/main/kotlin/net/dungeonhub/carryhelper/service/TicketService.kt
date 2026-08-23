@@ -78,7 +78,7 @@ object TicketService {
 
                         // A lot of credit and thanks to StrykerAW (383819291687911424) for the suggestion!
                         Minecraft.getInstance().execute {
-                            Minecraft.getInstance().gui.chat.addClientSystemMessage(
+                            Minecraft.getInstance().gui.hud.chat.addClientSystemMessage(
                                 Component.literal("[CH] You claimed a new ticket from $ign! Click here to invite them to a party.").setStyle(
                                     Style.EMPTY.withColor(ChatFormatting.GREEN).withClickEvent(ClickEvent.SuggestCommand("/party invite $ign"))
                                 )

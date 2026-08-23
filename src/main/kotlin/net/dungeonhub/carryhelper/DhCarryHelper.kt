@@ -7,6 +7,7 @@ import net.dungeonhub.carryhelper.auth.AuthenticationHandler
 import net.dungeonhub.carryhelper.commands.TicketCommand
 import net.dungeonhub.carryhelper.config.Config
 import net.dungeonhub.carryhelper.features.kuudra.KuudraFeature
+import net.dungeonhub.carryhelper.features.overlay.TicketOverlayFeature
 import net.dungeonhub.carryhelper.features.slayer.EndermanSlayerArea
 import net.dungeonhub.carryhelper.features.slayer.SlayerBossFeature
 import net.dungeonhub.carryhelper.logging.LogCommand
@@ -67,7 +68,7 @@ object DhCarryHelper : ClientModInitializer {
                     )
                     .executes {
                         Minecraft.getInstance().schedule {
-                            Minecraft.getInstance().setScreen(ResourcefulConfigScreen.getFactory(MOD_ID).apply(null))
+                            Minecraft.getInstance().gui.setScreen(ResourcefulConfigScreen.getFactory(MOD_ID).apply(null))
                         }
                         return@executes 1
                     }
@@ -119,5 +120,6 @@ object DhCarryHelper : ClientModInitializer {
         }
 
         KuudraFeature.initialize()
+        TicketOverlayFeature.init()
     }
 }

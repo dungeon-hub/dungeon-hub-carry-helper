@@ -151,7 +151,7 @@ object AuthenticationHandler : AuthenticationProvider {
                     logger.info(message)
 
                     Minecraft.getInstance().execute {
-                        Minecraft.getInstance().gui.chat.addClientSystemMessage(
+                        Minecraft.getInstance().gui.hud.chat.addClientSystemMessage(
                             Component.literal(message).setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN))
                         )
                     }

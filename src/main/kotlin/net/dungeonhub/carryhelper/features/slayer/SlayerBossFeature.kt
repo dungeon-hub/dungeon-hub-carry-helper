@@ -183,7 +183,7 @@ object SlayerBossFeature {
 
             if(createdQueues == null) {
                 Minecraft.getInstance().execute {
-                    Minecraft.getInstance().gui.chat.addClientSystemMessage(
+                    Minecraft.getInstance().gui.hud.chat.addClientSystemMessage(
                         Component.literal("[CH] Unable to automatically log this carry! Please make sure that the ticket is still valid and was setup properly.").setStyle(Style.EMPTY.withColor(ChatFormatting.RED))
                     )
                 }
@@ -194,7 +194,7 @@ object SlayerBossFeature {
 
             if(createdQueues.size != ticketIds.size) {
                 Minecraft.getInstance().execute {
-                    Minecraft.getInstance().gui.chat.addClientSystemMessage(
+                    Minecraft.getInstance().gui.hud.chat.addClientSystemMessage(
                         Component.literal("[CH] Only ${createdQueues.size} of the following $ticketIds carries were logged! Please check the related tickets manually.").setStyle(Style.EMPTY.withColor(ChatFormatting.RED))
                     )
                 }
@@ -212,7 +212,7 @@ object SlayerBossFeature {
                 } automatically!").setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN))
 
                 Minecraft.getInstance().execute {
-                    Minecraft.getInstance().gui.chat.addClientSystemMessage(message)
+                    Minecraft.getInstance().gui.hud.chat.addClientSystemMessage(message)
                 }
             }
         }

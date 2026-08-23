@@ -32,7 +32,7 @@ object ScoreboardUtil {
         val player = Minecraft.getInstance().player ?: return null
 
         val result = playerOrdering.sortedCopy(player.connection.onlinePlayers).map {
-            Minecraft.getInstance().gui.tabList.getNameForDisplay(it)
+            Minecraft.getInstance().gui.hud.tabList.getNameForDisplay(it)
         }
 
         return if (result.size < 80) result
@@ -40,7 +40,7 @@ object ScoreboardUtil {
     }
 
     fun getOnlinePlayersDisplayNames(): List<Component>? {
-        return getOnlinePlayers()?.map { Minecraft.getInstance().gui.tabList.getNameForDisplay(it) }
+        return getOnlinePlayers()?.map { Minecraft.getInstance().gui.hud.tabList.getNameForDisplay(it) }
     }
 
     fun getScoreboardLines(): Collection<PlayerScoreEntry>? {

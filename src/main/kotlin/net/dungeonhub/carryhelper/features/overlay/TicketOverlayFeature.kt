@@ -1,12 +1,16 @@
 package net.dungeonhub.carryhelper.features.overlay
 
+import net.dungeonhub.carryhelper.DhCarryHelper.MOD_ID
 import net.dungeonhub.carryhelper.auth.AuthenticationHandler
 import net.dungeonhub.carryhelper.config.categories.TicketCategory
 import net.dungeonhub.carryhelper.service.MojangService
 import net.dungeonhub.carryhelper.service.TicketService
 import net.dungeonhub.model.ticket.TicketModel
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
+import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
+import net.minecraft.resources.Identifier
 
 object TicketOverlayFeature {
     private const val OVERLAY_X = 10
@@ -15,8 +19,15 @@ object TicketOverlayFeature {
     private const val TEXT_COLOR = 0xFFFFFFFF.toInt()
     private const val BACKGROUND_COLOR = 0x80000000.toInt()
 
+    fun init() {
+        HudElementRegistry.attachElementBefore(
+            VanillaHudElements.PLAYER_LIST,
+            Identifier.fromNamespaceAndPath(MOD_ID, "ticket_overlay")
+        ) { graphics, _ -> render(graphics) }
+    }
+
     fun render(guiGraphics: GuiGraphicsExtractor) {
-        if (Minecraft.getInstance().options.hideGui) return
+        if (Minecraft.getInstance().gui.hud.isHidden) return
         if (!TicketCategory.showClaimedTicketOverlay) return
         if (!AuthenticationHandler.isValid()) return
 

@@ -57,17 +57,17 @@ object Config : ConfigKt("$MOD_ID/config") {
                             Style.EMPTY
                                 .withColor(ChatFormatting.GREEN)
                         )
-                    ) { Minecraft.getInstance().setScreen(null) }
+                    ) { Minecraft.getInstance().gui.setScreen(null) }
                     return@onClick
                 }
 
                 scheduler.launch {
                     Minecraft.getInstance().execute {
-                        Minecraft.getInstance().setScreen(null)
+                        Minecraft.getInstance().gui.setScreen(null)
                     }
                     result.collect {
                         Minecraft.getInstance().execute {
-                            Minecraft.getInstance().gui.chat.addClientSystemMessage(it)
+                            Minecraft.getInstance().gui.hud.chat.addClientSystemMessage(it)
                         }
                     }
                 }
@@ -86,7 +86,7 @@ object Config : ConfigKt("$MOD_ID/config") {
                         Style.EMPTY
                             .withColor(ChatFormatting.GREEN)
                     )
-                ) { Minecraft.getInstance().setScreen(null) }
+                ) { Minecraft.getInstance().gui.setScreen(null) }
             }
         }
 

@@ -7,7 +7,6 @@
     "ClickMixin",
     "ClientPacketListenerMixin",
     "ConnectionMixin",
-    "HudRenderMixin",
     "LivingEntityMixin"
   ],
   "injectors": {

@@ -1,5 +1,6 @@
 package net.dungeonhub.carryhelper.config
 
+import com.mojang.blaze3d.Blaze3D
 import com.teamresourceful.resourcefulconfig.api.types.elements.ResourcefulConfigSeparatorElement
 import com.teamresourceful.resourcefulconfig.api.types.options.TranslatableValue
 import com.teamresourceful.resourcefulconfigkt.api.ConfigKt
@@ -17,7 +18,7 @@ import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
-import net.minecraft.util.Util
+import java.net.URI
 import java.util.concurrent.Executors
 
 object Config : ConfigKt("$MOD_ID/config") {
@@ -99,7 +100,7 @@ object Config : ConfigKt("$MOD_ID/config") {
             description = "This is open source!"
             text = "Open"
             onClick {
-                Util.getPlatform().openUri("https://github.com/dungeon-hub/dungeon-hub-carry-helper/")
+                Blaze3D.openUri(URI.create("https://github.com/dungeon-hub/dungeon-hub-carry-helper/"))
             }
         }
 
@@ -108,7 +109,7 @@ object Config : ConfigKt("$MOD_ID/config") {
             description = "For questions and support, check out our discord"
             text = "Join"
             onClick {
-                Util.getPlatform().openUri("https://discord.dungeon-hub.net/")
+                Blaze3D.openUri(URI.create("https://discord.dungeon-hub.net/"))
             }
         }
 
@@ -117,7 +118,7 @@ object Config : ConfigKt("$MOD_ID/config") {
             description = "Support our development costs and keep the servers running"
             text = "Patreon"
             onClick {
-                Util.getPlatform().openUri("https://www.patreon.com/dungeon_hub/")
+                Blaze3D.openUri(URI.create("https://www.patreon.com/dungeon_hub/"))
             }
         }
 
@@ -126,7 +127,7 @@ object Config : ConfigKt("$MOD_ID/config") {
             description = "Check out our website to learn more about the bot and how to configure it"
             text = "Explore"
             onClick {
-                Util.getPlatform().openUri("https://dungeon-hub.net/")
+                Blaze3D.openUri(URI.create("https://dungeon-hub.net/"))
             }
         }
     }

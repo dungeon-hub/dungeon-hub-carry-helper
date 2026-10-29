@@ -1,0 +1,80 @@
+name: Patch Notes
+
+# Drafts the patch notes whenever mod_version in gradle.properties changes.
+# The notes end up in a draft GitHub release (v<mod_version>) to review and
+# publish. Set the ANTHROPIC_API_KEY secret to let Claude summarize the changes;
+# without it, the notes list the merged pull requests and commits.
+
+on:
+  push:
+    branches: [ "main", "version/**" ]
+    paths: [ "gradle.properties" ]
+  workflow_dispatch:
+
+jobs:
+  patch-notes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: read
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Check for a version bump
+        id: version
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          version=$(grep -m1 '^mod_version=' gradle.properties | cut -d= -f2-)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          previous=""
+          if [ "${{ github.event_name }}" = "push" ] && git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+            previous=$(git show "$BEFORE:gradle.properties" | grep -m1 '^mod_version=' | cut -d= -f2-)
+          fi
+          if [ "$previous" = "$version" ]; then
+            echo "mod_version is still $version, nothing to do."
+            echo "bumped=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "bumped=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up Python
+        if: steps.version.outputs.bumped == 'true'
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Generate patch notes
+        if: steps.version.outputs.bumped == 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          pip install --quiet anthropic
+          python .github/scripts/generate_patch_notes.py --output build/patch-notes.md
+          cat build/patch-notes.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload patch notes
+        if: steps.version.outputs.bumped == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          path: build/patch-notes.md
+          archive: false
+
+      - name: Update draft release
+        if: steps.version.outputs.bumped == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: v${{ steps.version.outputs.version }}
+        run: |
+          if ! is_draft=$(gh release view "$TAG" --json isDraft --jq .isDraft 2>/dev/null); then
+            gh release create "$TAG" --draft --target "$GITHUB_SHA" --title "$TAG" --notes-file build/patch-notes.md
+          elif [ "$is_draft" = "true" ]; then
+            gh release edit "$TAG" --target "$GITHUB_SHA" --notes-file build/patch-notes.md
+          else
+            echo "::warning::$TAG is already published, its notes were left unchanged."
+          fi

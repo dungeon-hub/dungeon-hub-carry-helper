@@ -2,8 +2,8 @@ name: Patch Notes
 
 # Drafts the patch notes whenever mod_version in gradle.properties changes.
 # The notes end up in a draft GitHub release (v<mod_version>) to review and
-# publish. Set the ANTHROPIC_API_KEY secret to let Claude summarize the changes;
-# without it, the notes list the merged pull requests and commits.
+# publish. Merged pull requests contribute the "Patch notes" section of their
+# description (see .github/pull_request_template.md).
 
 on:
   push:
@@ -51,10 +51,8 @@ jobs:
       - name: Generate patch notes
         if: steps.version.outputs.bumped == 'true'
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GH_TOKEN: ${{ github.token }}
         run: |
-          pip install --quiet anthropic
           python .github/scripts/generate_patch_notes.py --output build/patch-notes.md
           cat build/patch-notes.md >> "$GITHUB_STEP_SUMMARY"
 

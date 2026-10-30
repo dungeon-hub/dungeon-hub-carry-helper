@@ -2,17 +2,18 @@
 """Generates patch notes for the current mod version.
 
 Collects every change between the previous version bump (the last commit that
-changed ``mod_version`` in ``gradle.properties``) and the target ref, optionally
-lets Claude summarize them, and injects the result into a template.
+changed ``mod_version`` in ``gradle.properties``) and the target ref and injects
+it into a template.
+
+For merged pull requests, the "Patch notes" section of the description (see
+``.github/pull_request_template.md``) is used. If it is empty, the title is used
+instead; if it says "none", the pull request is left out. Commits pushed
+directly are listed by their subject.
 
 The template uses ``${name}`` placeholders, like the ResourcefulGradle
 template injection. Available values are every entry of ``gradle.properties``
 (e.g. ``${mod_version}``, ``${minecraft_version}``) plus ``${version}``,
 ``${previous_version}``, ``${compare_url}`` and ``${changes}``.
-
-Summarizing with Claude requires the ``anthropic`` package and an
-``ANTHROPIC_API_KEY``. Without them, the notes fall back to a plain list of the
-merged pull requests and commits.
 """
 
 import argparse
@@ -20,7 +21,6 @@ import json
 import os
 import re
 import subprocess
-import sys
 from pathlib import Path
 from string import Template
 
@@ -28,17 +28,9 @@ PROPERTIES_FILE = "gradle.properties"
 VERSION_KEY = "mod_version"
 BUMP_COMMIT = re.compile(r"^bump(ed)?\b", re.IGNORECASE)
 MERGE_PR = re.compile(r"^Merge pull request #(\d+)")
-
-SYSTEM_PROMPT = """You write patch notes for a Minecraft mod. They are published on \
-the mod's release page and read by players, not developers.
-
-Write a short Markdown list of the changes, grouped under the headings \
-"### Added", "### Changed" and "### Fixed" (leave out empty groups). Each \
-bullet is one sentence describing what changed for the player. Merge related \
-commits into one bullet, leave out purely internal changes (refactors, tests, \
-CI, version bumps) unless they affect players, and do not invent changes that \
-the input does not mention. Mention a pull request as (#123) when a bullet is \
-based on one. Reply with the list only, without a title or closing remarks."""
+PATCH_NOTES_HEADING = re.compile(r"^#+\s*patch notes\s*$", re.IGNORECASE | re.MULTILINE)
+NEXT_HEADING = re.compile(r"^#+\s", re.MULTILINE)
+HTML_COMMENT = re.compile(r"<!--.*?-->", re.DOTALL)
 
 
 def git(*args: str) -> str:
@@ -110,52 +102,45 @@ def gather_changes(revision_range: str) -> tuple[list[dict[str, str]], list[dict
     return pull_requests, commits
 
 
-def plain_changes(pull_requests: list[dict[str, str]], commits: list[dict[str, str]]) -> str:
-    lines = [f"- {pr['title']} (#{pr['number']})" for pr in pull_requests]
-    lines += [f"- {commit['subject']}" for commit in commits]
-    return "\n".join(lines) or "- No notable changes."
+def patch_notes_section(body: str) -> str | None:
+    """Returns the "Patch notes" section of a pull request description, or None if it has none."""
+    body = HTML_COMMENT.sub("", body or "").replace("\r\n", "\n")
+    heading = PATCH_NOTES_HEADING.search(body)
+    if not heading:
+        return None
+    section = body[heading.end():]
+    next_heading = NEXT_HEADING.search(section)
+    if next_heading:
+        section = section[:next_heading.start()]
+    # Drop the empty bullet the template comes with.
+    return "\n".join(line for line in section.splitlines() if line.strip() not in ("-", "*", "+")).strip()
 
 
-def describe_changes(pull_requests: list[dict[str, str]], commits: list[dict[str, str]]) -> str:
-    parts = []
+def as_bullets(text: str, suffix: str = "") -> list[str]:
+    """Turns text into Markdown list items, keeping indented lines (e.g. nested bullets) as they are."""
+    lines = []
+    for line in text.splitlines():
+        if not line.strip():
+            continue
+        if line.startswith((" ", "\t")):
+            lines.append(line.rstrip())
+            continue
+        if line.startswith(("- ", "* ", "+ ")):
+            line = line[2:]
+        lines.append(f"- {line.strip()}{suffix}")
+    return lines
+
+
+def render_changes(pull_requests: list[dict[str, str]], commits: list[dict[str, str]]) -> str:
+    lines = []
     for pr in pull_requests:
-        parts.append(f"Pull request #{pr['number']}: {pr['title']}\n{pr.get('body') or ''}".strip())
+        section = patch_notes_section(pr.get("body") or "")
+        if section and section.strip("-*. ").lower() == "none":
+            continue
+        lines += as_bullets(section or pr["title"], f" (#{pr['number']})")
     for commit in commits:
-        parts.append(f"Commit {commit['sha'][:7]}: {commit['subject']}\n{commit['body']}".strip())
-    return "\n\n".join(parts)
-
-
-def summarize_with_claude(changes: str, version: str, previous_version: str | None) -> str | None:
-    if not os.environ.get("ANTHROPIC_API_KEY"):
-        print("ANTHROPIC_API_KEY is not set, using the plain change list.", file=sys.stderr)
-        return None
-    try:
-        import anthropic
-    except ImportError:
-        print("The anthropic package is not installed, using the plain change list.", file=sys.stderr)
-        return None
-
-    client = anthropic.Anthropic()
-    header = f"Changes from version {previous_version} to {version}:" if previous_version else f"Changes in version {version}:"
-    try:
-        response = client.beta.messages.create(
-            model=os.environ.get("PATCH_NOTES_MODEL", "claude-opus-5-5"),
-            max_tokens=16000,
-            betas=["server-side-fallback-2026-07-01"],
-            fallbacks="default",
-            output_config={"effort": "medium"},
-            system=SYSTEM_PROMPT,
-            messages=[{"role": "user", "content": f"{header}\n\n{changes}"}],
-        )
-    except anthropic.APIError as error:
-        print(f"Summarizing with Claude failed ({error}), using the plain change list.", file=sys.stderr)
-        return None
-
-    if response.stop_reason != "end_turn":
-        print(f"Claude stopped with '{response.stop_reason}', using the plain change list.", file=sys.stderr)
-        return None
-    text = "".join(block.text for block in response.content if block.type == "text").strip()
-    return text or None
+        lines += as_bullets(commit["subject"])
+    return "\n".join(lines) or "- No notable changes."
 
 
 def compare_url(previous: str | None, ref: str) -> str:
@@ -171,7 +156,6 @@ def main() -> None:
     parser.add_argument("--ref", default="HEAD", help="the commit to generate the patch notes for")
     parser.add_argument("--template", default="templates/patch-notes.md.template", type=Path)
     parser.add_argument("--output", default="build/patch-notes.md", type=Path)
-    parser.add_argument("--no-ai", action="store_true", help="skip summarizing with Claude")
     args = parser.parse_args()
 
     properties = properties_at(args.ref)
@@ -181,11 +165,7 @@ def main() -> None:
     revision_range = f"{previous}..{args.ref}" if previous else args.ref
 
     pull_requests, commits = gather_changes(revision_range)
-    changes = None
-    if not args.no_ai and (pull_requests or commits):
-        changes = summarize_with_claude(describe_changes(pull_requests, commits), version, previous_version)
-    if changes is None:
-        changes = plain_changes(pull_requests, commits)
+    changes = render_changes(pull_requests, commits)
 
     values = {
         **properties,

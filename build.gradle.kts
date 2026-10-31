@@ -80,7 +80,7 @@ dependencies {
         isTransitive = false
     }
 
-    val apiClient = "net.dungeon-hub.api:client:0.7.0"
+    val apiClient = "net.dungeon-hub.api:client:0.9.0"
     implementation(apiClient)
     shadow(apiClient) {
         isTransitive = true

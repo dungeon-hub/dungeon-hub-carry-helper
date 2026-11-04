@@ -80,22 +80,9 @@ dependencies {
         isTransitive = false
     }
 
-    val apiClient = "net.dungeon-hub.api:client:0.7.0"
+    val apiClient = "net.dungeon-hub.api:client:0.8.0"
     implementation(apiClient)
     shadow(apiClient) {
-        isTransitive = true
-    }
-
-    // Explicitly include kord-core as it's needed by the API but marked as implementation/compileOnly
-    val kordCore = "dev.kord:kord-core:0.19.0-SNAPSHOT"
-    implementation(kordCore)
-    shadow(kordCore) {
-        isTransitive = true
-    }
-
-    val kordExTranslations = "dev.kordex.i18n:i18n:1.1.1"
-    implementation(kordExTranslations)
-    shadow(kordExTranslations) {
         isTransitive = true
     }
 

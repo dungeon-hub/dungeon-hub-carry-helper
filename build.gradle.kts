@@ -84,6 +84,18 @@ dependencies {
     implementation(apiClient)
     shadow(apiClient) {
         isTransitive = true
+
+        // Only swagger annotations (@Schema) use these, and they aren't needed at runtime
+        exclude(group = "io.swagger.core.v3")
+        exclude(group = "com.fasterxml.jackson.core")
+        exclude(group = "com.fasterxml.jackson.dataformat")
+        exclude(group = "com.fasterxml.jackson.datatype")
+        exclude(group = "org.yaml")
+        exclude(group = "jakarta.xml.bind")
+        exclude(group = "jakarta.validation")
+        exclude(group = "com.sun.activation")
+        // Provided by Minecraft
+        exclude(group = "org.apache.commons", module = "commons-lang3")
     }
 
     runtimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.2")

@@ -80,23 +80,22 @@ dependencies {
         isTransitive = false
     }
 
-    val apiClient = "net.dungeon-hub.api:client:0.7.2"
+    val apiClient = "net.dungeon-hub.api:client:0.8.0"
     implementation(apiClient)
     shadow(apiClient) {
         isTransitive = true
-    }
 
-    // Explicitly include kord-core as it's needed by the API but marked as implementation/compileOnly
-    val kordCore = "dev.kord:kord-core:0.19.0-SNAPSHOT"
-    implementation(kordCore)
-    shadow(kordCore) {
-        isTransitive = true
-    }
-
-    val kordExTranslations = "dev.kordex.i18n:i18n:1.1.1"
-    implementation(kordExTranslations)
-    shadow(kordExTranslations) {
-        isTransitive = true
+        // Only swagger annotations (@Schema) use these, and they aren't needed at runtime
+        exclude(group = "io.swagger.core.v3")
+        exclude(group = "com.fasterxml.jackson.core")
+        exclude(group = "com.fasterxml.jackson.dataformat")
+        exclude(group = "com.fasterxml.jackson.datatype")
+        exclude(group = "org.yaml")
+        exclude(group = "jakarta.xml.bind")
+        exclude(group = "jakarta.validation")
+        exclude(group = "com.sun.activation")
+        // Provided by Minecraft
+        exclude(group = "org.apache.commons", module = "commons-lang3")
     }
 
     runtimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.2")

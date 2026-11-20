@@ -6,11 +6,13 @@ import kotlinx.coroutines.*
 import net.dungeonhub.carryhelper.auth.AuthenticationHandler
 import net.dungeonhub.carryhelper.commands.TicketCommand
 import net.dungeonhub.carryhelper.config.Config
+import net.dungeonhub.carryhelper.features.dungeons.DungeonsFeature
 import net.dungeonhub.carryhelper.features.kuudra.KuudraFeature
 import net.dungeonhub.carryhelper.features.overlay.TicketOverlayFeature
 import net.dungeonhub.carryhelper.features.slayer.EndermanSlayerArea
 import net.dungeonhub.carryhelper.features.slayer.SlayerBossFeature
 import net.dungeonhub.carryhelper.logging.LogCommand
+import net.dungeonhub.carryhelper.service.MojangService
 import net.dungeonhub.carryhelper.service.TicketService
 import net.dungeonhub.carryhelper.util.MessageUtil.sendDebug
 import net.dungeonhub.carryhelper.util.MessageUtil.sendMessage
@@ -62,6 +64,52 @@ object DhCarryHelper : ClientModInitializer {
                                     ScoreboardUtil.getAreaLine()?.let { logger.sendDebug(it) }
                                     return@executes 1
                                 }
+                            )
+                            .then(
+                                ClientCommands.literal("neararmorstands").executes {
+                                    val player = Minecraft.getInstance().player ?: return@executes 1
+
+                                    val allVisibleEntities = SlayerBossFeature.getVisibleEntities().filter { it.distanceTo(player) < 20 }
+
+                                    Minecraft.getInstance().sendMessage(Component.literal("[CH] Armor Stands of ${allVisibleEntities.size} near entities sent to your game log."))
+                                    logger.info("[CH] Armor Stands of ${allVisibleEntities.size} near entities:")
+
+                                    for(entity in allVisibleEntities) {
+                                        logger.info("[CH]")
+                                        logger.info("[CH] ${entity.name.string}(${entity.type.description.string}) distance: ${entity.distanceTo(player)}")
+
+                                        val armorStands = SlayerBossFeature.getEntityArmorStands(entity)
+
+                                        for(armorStand in armorStands) {
+                                            logger.info("[CH] " + armorStand.name.string)
+                                        }
+                                    }
+
+                                    return@executes 1
+                                }
+                            ).then(
+                                ClientCommands.literal("nearslayers").executes {
+                                    val slayerBosses = SlayerBossFeature.getSlayerBosses()
+
+                                    Minecraft.getInstance().sendMessage(
+                                        Component.literal("[CH] Near Slayer Bosses: ${slayerBosses.size} (full list in game log)")
+                                    )
+
+                                    logger.info("[CH] ${slayerBosses.size} near Slayer Bosses:")
+
+                                    for(slayerBoss in slayerBosses) {
+                                        logger.info("[CH]")
+                                        logger.info("[CH] ${slayerBoss.slayerBossType} (in ${slayerBoss.area}) by ${slayerBoss.spawner} ${slayerBoss.entity.type.description.string}")
+
+                                        val armorStands = SlayerBossFeature.getEntityArmorStands(slayerBoss.entity)
+
+                                        for(armorStand in armorStands) {
+                                            logger.info("[CH] " + armorStand.name.string)
+                                        }
+                                    }
+
+                                    return@executes 1
+                                }
                             ).executes {
                                 return@executes 0
                             }
@@ -111,8 +159,13 @@ object DhCarryHelper : ClientModInitializer {
         }
 
         ClientLifecycleEvents.CLIENT_STOPPING.register {
+            shutdown()
             TicketService.shutdown()
             AuthenticationHandler.shutdown()
+            MojangService.shutdown()
+            SlayerBossFeature.shutdown()
+            KuudraFeature.shutdown()
+            DungeonsFeature.shutdown()
         }
 
         ClientTickEvents.END_CLIENT_TICK.register {
@@ -121,5 +174,10 @@ object DhCarryHelper : ClientModInitializer {
 
         KuudraFeature.initialize()
         TicketOverlayFeature.init()
+    }
+
+    private fun shutdown() {
+        supervisor.cancel()
+        dispatcher.close()
     }
 }

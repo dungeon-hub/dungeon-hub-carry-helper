@@ -46,6 +46,11 @@ object DungeonsFeature {
 
     private val scheduler = CoroutineScope(supervisor + dispatcher)
 
+    fun shutdown() {
+        supervisor.cancel()
+        dispatcher.close()
+    }
+
     fun handleMessage(text: String) {
         if(text.isEmpty()) return
 

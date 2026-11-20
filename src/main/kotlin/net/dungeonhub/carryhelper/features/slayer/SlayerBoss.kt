@@ -12,8 +12,8 @@ class SlayerBoss(
     var area: EndermanSlayerArea? = null
 
     val spawner: String?
-        get() = armorStands.firstOrNull { it.name.string.startsWith("Spawned by:") }
-            ?.name?.string?.substringAfter("Spawned by: ")?.trim()
+        get() = armorStands.firstOrNull { it.name.string.endsWith("'s SLAYER BOSS") }
+            ?.name?.string?.substringBefore("'s SLAYER BOSS")?.trim()
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

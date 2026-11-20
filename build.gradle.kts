@@ -159,6 +159,7 @@ tasks.shadowJar {
     exclude("org/jetbrains/annotations/**")
     exclude("org/intellij/**")
     exclude("com/google/errorprone/**")
+    exclude("org/slf4j/**")
 
     // Relocate ALL other dependencies to avoid conflicts
     relocate("com.squareup.moshi", "net.dungeonhub.carryhelper.libs.moshi")
@@ -172,7 +173,6 @@ tasks.shadowJar {
     relocate("jakarta", "net.dungeonhub.carryhelper.libs.jakarta")
     relocate("org.apache.commons", "net.dungeonhub.carryhelper.libs.apache.commons")
     relocate("org.yaml.snakeyaml", "net.dungeonhub.carryhelper.libs.snakeyaml")
-    relocate("org.slf4j", "net.dungeonhub.carryhelper.libs.slf4j")
     relocate("dev.kord", "net.dungeonhub.carryhelper.libs.kord")
     relocate("dev.kordex.i18n", "net.dungeonhub.carryhelper.libs.kordex-i18n")
     relocate("io.github.oshai.kotlinlogging", "net.dungeonhub.carryhelper.libs.kotlinlogging")

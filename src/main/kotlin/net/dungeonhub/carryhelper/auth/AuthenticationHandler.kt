@@ -6,7 +6,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -72,7 +71,7 @@ object AuthenticationHandler : AuthenticationProvider {
         private set
 
     fun shutdown() {
-        scheduler.cancel()
+        supervisor.cancel()
         dispatcher.close()
     }
 

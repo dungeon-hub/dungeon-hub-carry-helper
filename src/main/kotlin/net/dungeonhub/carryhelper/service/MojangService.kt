@@ -138,6 +138,11 @@ object MojangService {
         }
     }
 
+    fun shutdown() {
+        supervisor.cancel()
+        dispatcher.close()
+    }
+
     @Serializable
     private data class MojangProfile(
         val id: String,

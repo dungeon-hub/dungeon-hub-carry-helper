@@ -38,6 +38,11 @@ object SlayerBossFeature {
 
     private val scheduler = CoroutineScope(supervisor + dispatcher)
 
+    fun shutdown() {
+        supervisor.cancel()
+        dispatcher.close()
+    }
+
     fun handleLeftClick(hitResult: HitResult) {
         if(hitResult.type == HitResult.Type.ENTITY) {
             handleHitEntity((hitResult as EntityHitResult).entity)

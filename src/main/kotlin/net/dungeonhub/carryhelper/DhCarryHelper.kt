@@ -6,11 +6,13 @@ import kotlinx.coroutines.*
 import net.dungeonhub.carryhelper.auth.AuthenticationHandler
 import net.dungeonhub.carryhelper.commands.TicketCommand
 import net.dungeonhub.carryhelper.config.Config
+import net.dungeonhub.carryhelper.features.dungeons.DungeonsFeature
 import net.dungeonhub.carryhelper.features.kuudra.KuudraFeature
 import net.dungeonhub.carryhelper.features.overlay.TicketOverlayFeature
 import net.dungeonhub.carryhelper.features.slayer.EndermanSlayerArea
 import net.dungeonhub.carryhelper.features.slayer.SlayerBossFeature
 import net.dungeonhub.carryhelper.logging.LogCommand
+import net.dungeonhub.carryhelper.service.MojangService
 import net.dungeonhub.carryhelper.service.TicketService
 import net.dungeonhub.carryhelper.util.MessageUtil.sendDebug
 import net.dungeonhub.carryhelper.util.MessageUtil.sendMessage
@@ -157,8 +159,13 @@ object DhCarryHelper : ClientModInitializer {
         }
 
         ClientLifecycleEvents.CLIENT_STOPPING.register {
+            shutdown()
             TicketService.shutdown()
             AuthenticationHandler.shutdown()
+            MojangService.shutdown()
+            SlayerBossFeature.shutdown()
+            KuudraFeature.shutdown()
+            DungeonsFeature.shutdown()
         }
 
         ClientTickEvents.END_CLIENT_TICK.register {
@@ -167,5 +174,10 @@ object DhCarryHelper : ClientModInitializer {
 
         KuudraFeature.initialize()
         TicketOverlayFeature.init()
+    }
+
+    private fun shutdown() {
+        supervisor.cancel()
+        dispatcher.close()
     }
 }

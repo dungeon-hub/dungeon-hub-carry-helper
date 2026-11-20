@@ -140,4 +140,9 @@ object KuudraFeature {
             scheduler.async { MojangService.awaitPlayerUuid(name) }
         }?.awaitAll()?.filterNotNull() ?: emptyList()
     }
+
+    fun shutdown() {
+        supervisor.cancel()
+        dispatcher.close()
+    }
 }

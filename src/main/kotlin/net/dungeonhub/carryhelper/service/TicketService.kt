@@ -54,6 +54,8 @@ object TicketService {
 
     fun shutdown() {
         isRunning = false
+        supervisor.cancel()
+        dispatcher.close()
     }
 
     fun getClaimedTickets(): List<TicketModel>? = claimedTickets

@@ -71,6 +71,16 @@ object SlayerBossFeature {
         
     }
 
+    fun getVisibleEntities(): List<Entity> {
+        val currentWorld = currentWorld ?: return emptyList()
+
+        return currentWorld.entitiesForRendering().filter { it !is ArmorStand }
+    }
+
+    fun getSlayerBosses(): Set<SlayerBoss> {
+        return slayerBosses
+    }
+
     fun onTick() {
         if(currentWorld != null && currentWorld != Minecraft.getInstance().level) {
             slayerBosses.clear()
@@ -80,8 +90,8 @@ object SlayerBossFeature {
             currentWorld = Minecraft.getInstance().level
         }
 
-        val currentWorld = currentWorld ?: return
-        val allVisibleEntities = currentWorld.entitiesForRendering().filter { it !is ArmorStand }
+        val allVisibleEntities = getVisibleEntities()
+        if(allVisibleEntities.isEmpty()) return
 
         val currentSlayerBosses = mutableSetOf<SlayerBoss>()
 

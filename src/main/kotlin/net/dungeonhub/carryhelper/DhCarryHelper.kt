@@ -62,6 +62,52 @@ object DhCarryHelper : ClientModInitializer {
                                     ScoreboardUtil.getAreaLine()?.let { logger.sendDebug(it) }
                                     return@executes 1
                                 }
+                            )
+                            .then(
+                                ClientCommands.literal("neararmorstands").executes {
+                                    val player = Minecraft.getInstance().player ?: return@executes 1
+
+                                    val allVisibleEntities = SlayerBossFeature.getVisibleEntities().filter { it.distanceTo(player) < 20 }
+
+                                    Minecraft.getInstance().sendMessage(Component.literal("[CH] Armor Stands of ${allVisibleEntities.size} near entities sent to your game log."))
+                                    logger.info("[CH] Armor Stands of ${allVisibleEntities.size} near entities:")
+
+                                    for(entity in allVisibleEntities) {
+                                        logger.info("[CH]")
+                                        logger.info("[CH] ${entity.name.string}(${entity.type.description.string}) distance: ${entity.distanceTo(player)}")
+
+                                        val armorStands = SlayerBossFeature.getEntityArmorStands(entity)
+
+                                        for(armorStand in armorStands) {
+                                            logger.info("[CH] " + armorStand.name.string)
+                                        }
+                                    }
+
+                                    return@executes 1
+                                }
+                            ).then(
+                                ClientCommands.literal("nearslayers").executes {
+                                    val slayerBosses = SlayerBossFeature.getSlayerBosses()
+
+                                    Minecraft.getInstance().sendMessage(
+                                        Component.literal("[CH] Near Slayer Bosses: ${slayerBosses.size} (full list in game log)")
+                                    )
+
+                                    logger.info("[CH] ${slayerBosses.size} near Slayer Bosses:")
+
+                                    for(slayerBoss in slayerBosses) {
+                                        logger.info("[CH]")
+                                        logger.info("[CH] ${slayerBoss.slayerBossType} (in ${slayerBoss.area}) by ${slayerBoss.spawner} ${slayerBoss.entity.type.description.string}")
+
+                                        val armorStands = SlayerBossFeature.getEntityArmorStands(slayerBoss.entity)
+
+                                        for(armorStand in armorStands) {
+                                            logger.info("[CH] " + armorStand.name.string)
+                                        }
+                                    }
+
+                                    return@executes 1
+                                }
                             ).executes {
                                 return@executes 0
                             }

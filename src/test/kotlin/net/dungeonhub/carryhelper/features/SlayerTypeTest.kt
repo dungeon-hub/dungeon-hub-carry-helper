@@ -8,9 +8,9 @@ import kotlin.test.assertEquals
 class SlayerTypeTest {
     @Test
     fun testSlayerType() {
-        assertEquals(SlayerBossType.Revenant1, SlayerBoss.findSlayerType("༕ ☠ Revenant Horror I 500❤"))
-        assertEquals(SlayerBossType.Voidgloom3, SlayerBoss.findSlayerType("? ☠ Voidgloom Seraph III 165.5M❤"))
-        assertEquals(SlayerBossType.Voidgloom4, SlayerBoss.findSlayerType("? ☠ Voidgloom Seraph IV 165.5M❤"))
-        assertEquals(SlayerBossType.Voidgloom4, SlayerBoss.findSlayerType("༕ ☠ Voidgloom Seraph IV 89 Hits"))
+        assertEquals(SlayerBossType.Revenant1, SlayerBoss.findSlayerType("[Lv7] \uE084 Revenant Horror I 54/500❤"))
+        assertEquals(SlayerBossType.Voidgloom3, SlayerBoss.findSlayerType("[Lv655] \uE078 Voidgloom Seraph III 38.6M/210M❤"))
+        assertEquals(SlayerBossType.Voidgloom4, SlayerBoss.findSlayerType("[Lv655] \uE078 Voidgloom Seraph IV 38.6M/210M❤"))
+        assertEquals(SlayerBossType.Voidgloom4, SlayerBoss.findSlayerType("[Lv655] \uE078 Voidgloom Seraph IV 52 Hits"))
     }
 }

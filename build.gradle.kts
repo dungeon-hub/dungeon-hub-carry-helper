@@ -49,20 +49,6 @@ repositories {
             includeGroup("com.teamresourceful.resourcefulconfigkt")
         }
     }
-
-    maven("https://releases-repo.kordex.dev") {
-        name = "KordEx Releases Repository"
-        content {
-            includeGroup("dev.kordex.i18n")
-        }
-    }
-
-    maven("https://repo.kordex.dev/mirror") {
-        name = "Kord Mirror Repository"
-        content {
-            includeGroup("dev.kord")
-        }
-    }
 }
 
 dependencies {

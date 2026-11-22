@@ -67,8 +67,6 @@ object SlayerBossFeature {
     }
 
     fun onSlayerDeath(slayerBoss: SlayerBoss) {
-        if(slayerBoss.spawner == null) return
-
         logCompletedSlayerCarry(slayerBoss)
     }
 
@@ -172,7 +170,7 @@ object SlayerBossFeature {
             return
         }
 
-        logger.sendInfo("[CH] Slayer boss from ${slayerBoss.spawner} was killed!")
+        logger.sendInfo("[CH] Slayer boss from $spawner was killed!")
 
         val claimedTickets = TicketService.getClaimedTickets() ?: return
 

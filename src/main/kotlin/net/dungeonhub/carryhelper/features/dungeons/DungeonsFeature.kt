@@ -9,8 +9,8 @@ import kotlinx.coroutines.launch
 import net.dungeonhub.carryhelper.auth.AuthenticationHandler
 import net.dungeonhub.carryhelper.service.MojangService
 import net.dungeonhub.carryhelper.service.TicketService
-import net.dungeonhub.carryhelper.util.MessageUtil.sendDebug
-import net.dungeonhub.carryhelper.util.MessageUtil.sendDevDebug
+import net.dungeonhub.carryhelper.util.MessageUtil.sendInfo
+import net.dungeonhub.carryhelper.util.MessageUtil.sendDevInfo
 import net.dungeonhub.carryhelper.util.MessageUtil.sendDevError
 import net.dungeonhub.carryhelper.util.ScoreboardUtil
 import net.dungeonhub.connection.QueueConnection
@@ -84,7 +84,7 @@ object DungeonsFeature {
 
         val carryType = dungeonFloor.getCarryType(lastScore ?: return)
 
-        logger.sendDebug("[CH] Trying to log: $carryType")
+        logger.sendInfo("[CH] Trying to log: $carryType")
 
         val claimedTickets = TicketService.getClaimedTickets() ?: return
 
@@ -99,7 +99,7 @@ object DungeonsFeature {
             val ticketIds = claimedTickets.filter { users.contains(it.user.minecraftId) }.map { it.id }
 
             if(ticketIds.isEmpty()) {
-                logger.sendDevDebug("[CH] Couldn't find any related tickets for the following users in the dungeon: ${users.joinToString { MojangService.getPlayerName(it) ?: it.toString() }}")
+                logger.sendDevInfo("[CH] Couldn't find any related tickets for the following users in the dungeon: ${users.joinToString { MojangService.getPlayerName(it) ?: it.toString() }}")
                 return@launch
             }
 
@@ -115,7 +115,7 @@ object DungeonsFeature {
                     )
                 }
 
-                logger.sendDevDebug("[CH] Unable to log type $carryType for tickets $ticketIds with users: $users")
+                logger.sendDevInfo("[CH] Unable to log type $carryType for tickets $ticketIds with users: $users")
                 return@launch
             }
 
@@ -126,7 +126,7 @@ object DungeonsFeature {
                     )
                 }
 
-                logger.sendDevDebug("[CH] For the ticket $ticketIds, only the following carry queues were added:${
+                logger.sendDevInfo("[CH] For the ticket $ticketIds, only the following carry queues were added:${
                     createdQueues.map { "#${it.id}: ${it.amount} ${it.carryDifficulty.displayName} (${it.carryDifficulty.identifier} #${it.carryDifficulty.id}) related to ${it.relationId}" }
                 }")
             } else {
@@ -158,7 +158,7 @@ object DungeonsFeature {
     fun handleDefeatedMessage(text: String) {
         val result = defeatedRegex.find(text)
         if(result == null) {
-            logger.sendDevDebug("[CH] Tried to log a carry, but it seems like the dungeon boss wasn't beaten: $text")
+            logger.sendDevInfo("[CH] Tried to log a carry, but it seems like the dungeon boss wasn't beaten: $text")
             lastScore = null
             lastType = null
             lastFloor = null
@@ -166,7 +166,7 @@ object DungeonsFeature {
             return
         }
 
-        logger.sendDebug("[CH] The dungeon boss was defeated, trying to log the carry")
+        logger.sendInfo("[CH] The dungeon boss was defeated, trying to log the carry")
 
         logCompletedCatacombsCarry()
     }
@@ -187,7 +187,7 @@ object DungeonsFeature {
         scoreLastMessage = true
         lastScore = score
 
-        logger.sendDebug("[CH] Completed the floor with $score")
+        logger.sendInfo("[CH] Completed the floor with $score")
     }
 
     fun handleFloorMessage(text: String) {
@@ -200,6 +200,6 @@ object DungeonsFeature {
         lastType = type
         lastFloor = floor
 
-        logger.sendDebug("[CH] Completed $type floor $floor!")
+        logger.sendInfo("[CH] Completed $type floor $floor!")
     }
 }

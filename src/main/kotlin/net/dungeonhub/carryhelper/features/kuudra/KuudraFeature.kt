@@ -9,8 +9,8 @@ import kotlinx.coroutines.launch
 import net.dungeonhub.carryhelper.auth.AuthenticationHandler
 import net.dungeonhub.carryhelper.service.MojangService
 import net.dungeonhub.carryhelper.service.TicketService
-import net.dungeonhub.carryhelper.util.MessageUtil.sendDebug
-import net.dungeonhub.carryhelper.util.MessageUtil.sendDevDebug
+import net.dungeonhub.carryhelper.util.MessageUtil.sendInfo
+import net.dungeonhub.carryhelper.util.MessageUtil.sendDevInfo
 import net.dungeonhub.carryhelper.util.MessageUtil.sendDevError
 import net.dungeonhub.carryhelper.util.ScoreboardUtil
 import net.dungeonhub.connection.QueueConnection
@@ -64,7 +64,7 @@ object KuudraFeature {
             return
         }
 
-        logger.sendDebug("[CH] Completed Kuudra $tier!")
+        logger.sendInfo("[CH] Completed Kuudra $tier!")
 
         logCompletedKuudraCarry(tier)
     }
@@ -72,7 +72,7 @@ object KuudraFeature {
     fun logCompletedKuudraCarry(tier: KuudraTier) {
         val carryType = tier.carryType
 
-        logger.sendDebug("[CH] Trying to log: $carryType")
+        logger.sendInfo("[CH] Trying to log: $carryType")
 
         val claimedTickets = TicketService.getClaimedTickets() ?: return
 
@@ -87,7 +87,7 @@ object KuudraFeature {
             val ticketIds = claimedTickets.filter { users.contains(it.user.minecraftId) }.map { it.id }
 
             if(ticketIds.isEmpty()) {
-                logger.sendDevDebug("[CH] Couldn't find any related tickets for the following users in the Kuudra run: $users")
+                logger.sendDevInfo("[CH] Couldn't find any related tickets for the following users in the Kuudra run: $users")
                 return@launch
             }
 
@@ -103,7 +103,7 @@ object KuudraFeature {
                     )
                 }
 
-                logger.sendDevDebug("[CH] Unable to log type $carryType for tickets $ticketIds with users: $users")
+                logger.sendDevInfo("[CH] Unable to log type $carryType for tickets $ticketIds with users: $users")
                 return@launch
             }
 
@@ -114,7 +114,7 @@ object KuudraFeature {
                     )
                 }
 
-                logger.sendDevDebug("[CH] For the ticket $ticketIds, only the following carry queues were added:${
+                logger.sendDevInfo("[CH] For the ticket $ticketIds, only the following carry queues were added:${
                     createdQueues.map { "#${it.id}: ${it.amount} ${it.carryDifficulty.displayName} (${it.carryDifficulty.identifier} #${it.carryDifficulty.id}) related to ${it.relationId}" }
                 }")
             } else {

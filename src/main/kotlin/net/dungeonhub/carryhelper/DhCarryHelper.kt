@@ -14,7 +14,7 @@ import net.dungeonhub.carryhelper.features.slayer.SlayerBossFeature
 import net.dungeonhub.carryhelper.logging.LogCommand
 import net.dungeonhub.carryhelper.service.MojangService
 import net.dungeonhub.carryhelper.service.TicketService
-import net.dungeonhub.carryhelper.util.MessageUtil.sendDebug
+import net.dungeonhub.carryhelper.util.MessageUtil.sendInfo
 import net.dungeonhub.carryhelper.util.MessageUtil.sendMessage
 import net.dungeonhub.carryhelper.util.ScoreboardUtil
 import net.fabricmc.api.ClientModInitializer
@@ -61,7 +61,7 @@ object DhCarryHelper : ClientModInitializer {
                             .then(
                                 ClientCommands.literal("currentarea").executes {
                                     Minecraft.getInstance().sendMessage(Component.literal("[CH] Current area: ${EndermanSlayerArea.getArea()?.name ?: "None found"}"))
-                                    ScoreboardUtil.getAreaLine()?.let { logger.sendDebug(it) }
+                                    ScoreboardUtil.getAreaLine()?.let { logger.sendInfo(it) }
                                     return@executes 1
                                 }
                             )

@@ -8,8 +8,8 @@ import net.dungeonhub.carryhelper.auth.AuthenticationHandler
 import net.dungeonhub.carryhelper.features.slayer.SlayerBoss.Companion.findSlayerType
 import net.dungeonhub.carryhelper.service.MojangService
 import net.dungeonhub.carryhelper.service.TicketService
-import net.dungeonhub.carryhelper.util.MessageUtil.sendDebug
-import net.dungeonhub.carryhelper.util.MessageUtil.sendDevDebug
+import net.dungeonhub.carryhelper.util.MessageUtil.sendInfo
+import net.dungeonhub.carryhelper.util.MessageUtil.sendDevInfo
 import net.dungeonhub.carryhelper.util.MessageUtil.sendDevError
 import net.dungeonhub.connection.QueueConnection
 import net.dungeonhub.enums.IngameCarryType
@@ -168,11 +168,11 @@ object SlayerBossFeature {
         val ingameCarryType = resolveIngameCarryType(slayerBoss)
 
         if(spawner == null) {
-            logger.sendDevDebug("[CH] Slayer with no spawner has been tried to log!")
+            logger.sendDevInfo("[CH] Slayer with no spawner has been tried to log!")
             return
         }
 
-        logger.sendDebug("[CH] Slayer boss from ${slayerBoss.spawner} was killed!")
+        logger.sendInfo("[CH] Slayer boss from ${slayerBoss.spawner} was killed!")
 
         val claimedTickets = TicketService.getClaimedTickets() ?: return
 
@@ -187,7 +187,7 @@ object SlayerBossFeature {
             val ticketIds = claimedTickets.filter { carriedUser == it.user.minecraftId }.map { it.id }
 
             if(ticketIds.isEmpty()) {
-                logger.sendDevDebug("[CH] Couldn't find a related ticket for killed slayer from $spawner!")
+                logger.sendDevInfo("[CH] Couldn't find a related ticket for killed slayer from $spawner!")
                 return@launch
             }
 
@@ -203,7 +203,7 @@ object SlayerBossFeature {
                     )
                 }
 
-                logger.sendDevDebug("[CH] Unable to log type ${slayerBoss.slayerBossType} for tickets $ticketIds with spawner $spawner and entity ${slayerBoss.entity}")
+                logger.sendDevInfo("[CH] Unable to log type ${slayerBoss.slayerBossType} for tickets $ticketIds with spawner $spawner and entity ${slayerBoss.entity}")
                 return@launch
             }
 
@@ -214,7 +214,7 @@ object SlayerBossFeature {
                     )
                 }
 
-                logger.sendDevDebug("[CH] For the ticket $ticketIds, only the following carry queues were added:${
+                logger.sendDevInfo("[CH] For the ticket $ticketIds, only the following carry queues were added:${
                     createdQueues.map { "#${it.id}: ${it.amount} ${it.carryDifficulty.displayName} (${it.carryDifficulty.identifier} #${it.carryDifficulty.id}) related to ${it.relationId}" }
                 }")
             } else {

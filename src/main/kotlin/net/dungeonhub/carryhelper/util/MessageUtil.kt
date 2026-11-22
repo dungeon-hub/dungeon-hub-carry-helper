@@ -23,7 +23,7 @@ object MessageUtil {
         }
     }
 
-    fun Logger.sendDevDebug(message: String) {
+    fun Logger.sendDevInfo(message: String) {
         if (DhCarryHelper.isDev || DevCategory.extendedDebug) {
             Minecraft.getInstance().execute {
                 Minecraft.getInstance().gui.hud.chat.addClientSystemMessage(
@@ -31,11 +31,11 @@ object MessageUtil {
                 )
             }
         } else {
-            debug(message)
+            info(message)
         }
     }
 
-    fun Logger.sendDebug(message: String) {
+    fun Logger.sendInfo(message: String) {
         if (DhCarryHelper.isDev || DevCategory.extendedDebug) {
             Minecraft.getInstance().execute {
                 Minecraft.getInstance().gui.hud.chat.addClientSystemMessage(
@@ -44,7 +44,7 @@ object MessageUtil {
             }
         }
 
-        debug(message)
+        info(message)
     }
 
     /**

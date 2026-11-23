@@ -1,0 +1,7 @@
+## Dungeon Hub Carry Helper ${version}
+
+Minecraft ${minecraft_version} · Fabric Loader ${loader_version}+ · Fabric API ${fabric_version}
+
+${changes}
+
+**Full changelog:** ${compare_url}

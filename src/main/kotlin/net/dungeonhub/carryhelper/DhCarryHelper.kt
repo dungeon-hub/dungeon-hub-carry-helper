@@ -1,5 +1,6 @@
 package net.dungeonhub.carryhelper
 
+import com.mojang.brigadier.arguments.StringArgumentType
 import com.teamresourceful.resourcefulconfig.api.client.ResourcefulConfigScreen
 import com.teamresourceful.resourcefulconfig.api.loader.Configurator
 import kotlinx.coroutines.*
@@ -7,6 +8,7 @@ import net.dungeonhub.carryhelper.auth.AuthenticationHandler
 import net.dungeonhub.carryhelper.commands.TicketCommand
 import net.dungeonhub.carryhelper.config.Config
 import net.dungeonhub.carryhelper.features.dungeons.DungeonsFeature
+import net.dungeonhub.carryhelper.features.highlight.UserHighlighter
 import net.dungeonhub.carryhelper.features.kuudra.KuudraFeature
 import net.dungeonhub.carryhelper.features.overlay.TicketOverlayFeature
 import net.dungeonhub.carryhelper.features.slayer.EndermanSlayerArea
@@ -27,6 +29,7 @@ import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import org.slf4j.LoggerFactory
+import java.awt.Color
 import java.util.concurrent.Executors
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -110,6 +113,20 @@ object DhCarryHelper : ClientModInitializer {
 
                                     return@executes 1
                                 }
+                            ).then(
+                                ClientCommands.literal("togglehighlight").then(
+                                    ClientCommands.argument("name", StringArgumentType.word()).executes {
+                                        val name = StringArgumentType.getString(it, "name")
+
+                                        if(UserHighlighter.highlightedUsers.containsKey(name)) {
+                                            UserHighlighter.highlightedUsers.remove(name)
+                                        } else {
+                                            UserHighlighter.highlightedUsers[name] = Color.RED.rgb
+                                        }
+
+                                        return@executes 1
+                                    }
+                                )
                             ).executes {
                                 return@executes 0
                             }
@@ -174,6 +191,7 @@ object DhCarryHelper : ClientModInitializer {
 
         KuudraFeature.initialize()
         TicketOverlayFeature.init()
+        UserHighlighter.initialize()
     }
 
     private fun shutdown() {

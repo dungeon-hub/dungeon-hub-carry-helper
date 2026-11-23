@@ -49,6 +49,13 @@ repositories {
             includeGroup("com.teamresourceful.resourcefulconfigkt")
         }
     }
+
+    maven("https://maven.azureaaron.net/releases/") {
+        name = "Aaron Maven (Render-Chest)"
+        content {
+            includeGroup("net.azureaaron")
+        }
+    }
 }
 
 dependencies {
@@ -83,6 +90,11 @@ dependencies {
         // Provided by Minecraft
         exclude(group = "org.apache.commons", module = "commons-lang3")
     }
+
+    // Render Chest for Entity Glowing Mechanics: https://maven.azureaaron.net/#/releases/net/azureaaron/render-chest
+    val renderChest = "net.azureaaron:render-chest:1.0.3+26.2"
+    implementation(renderChest)
+    include(renderChest)
 
     runtimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.2")
 

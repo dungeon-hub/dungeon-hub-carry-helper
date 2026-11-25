@@ -140,4 +140,9 @@ object Config : ConfigKt("$MOD_ID/config") {
         category(TicketCategory)
         category(DevCategory)
     }
+
+    fun shutdown() {
+        supervisor.cancel()
+        dispatcher.close()
+    }
 }

@@ -183,6 +183,7 @@ object DhCarryHelper : ClientModInitializer {
             SlayerBossFeature.shutdown()
             KuudraFeature.shutdown()
             DungeonsFeature.shutdown()
+            Config.shutdown()
         }
 
         ClientTickEvents.END_CLIENT_TICK.register {
